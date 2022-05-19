@@ -1,5 +1,5 @@
-const racine = 'https://tracking.socecepme.com/api/'
-//const racine = 'http://172.17.224.1/Tracking/public/api/';
+//const racine = 'https://tracking.socecepme.com/api/'
+const racine = 'http://172.31.96.1/Tracking/public/api/';
 const URI = racine + 'choixentreprise';
 const URL = racine + 'choixgroupe';
 const URL1 = racine + 'choixproduit';

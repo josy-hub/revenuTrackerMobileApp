@@ -62,8 +62,8 @@ class Register extends React.Component {
         body: raw,
         redirect: 'follow'
       };
-    //const racine = 'http://172.17.224.1/Tracking/public/api/';
-    const racine = 'http://tracking.socecepme.com/api/'
+    //const racine = 'http://172.31.96.1/Tracking/public/api/';
+    const racine = 'http://tracking.socecepme.com/api/';
     fetch(racine + 'login', requestOptions)
       .then(response => response.text())
       .then(result => { 
@@ -93,16 +93,6 @@ class Register extends React.Component {
               style={{ width, height }}
             >
             <ScrollView>
-              {/* <Block style={{flexDirection:'row'}}><Text h3
-                style={{
-                  marginHorizontal:160,
-                  marginTop:70,
-                  marginBottom:-100
-                }}
-                color="green"
-                  >LOGO
-                  </Text>
-              </Block>  */}
               <Image
                 style={styles.tinyLogo}
                 source={Images.Applilogo}

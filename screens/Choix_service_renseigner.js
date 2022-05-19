@@ -60,6 +60,8 @@
   let mindate=now-549094194;
   let mindatef=new Date(mindate);
 
+  const racine = 'http://172.31.96.1/Tracking/public/api/';
+  //const racine = 'https:tracking.socecepme.com/api/';
   class Choix_service_renseigner extends React.Component {
     
     constructor(props){
@@ -254,7 +256,7 @@
             body: raw,
             redirect: 'follow'
         };
-        const URL=`http://tracking.socecepme.com/api/fournisseurs`;
+        const URL=`${racine}fournisseurs`;
         await fetch(URL, requestOptions)
           .then(response => response.text())
           .then(result => {
@@ -290,7 +292,7 @@
             body: raw,
             redirect: 'follow'
         };
-        const URL=`http://tracking.socecepme.com/api/fournisseurs`;
+        const URL=`${racine}fournisseurs`;
         await fetch(URL, requestOptions)
           .then(response => response.text())
           .then(result => {
@@ -350,7 +352,7 @@
             body: raw,
             redirect: 'follow'
         };
-        const URL='http://tracking.socecepme.com/api/sauvegardes';
+        const URL=`${racine}sauvegardes`;
         
         fetch(URL, requestOptions)
         .then(response => response.text())

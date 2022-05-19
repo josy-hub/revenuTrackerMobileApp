@@ -33,6 +33,8 @@ const placeholder = {
     color: '#9EA0A4',*/
   };
 
+const racine = 'http://172.31.96.1/Tracking/public/api/';
+  //const racine = 'https:tracking.socecepme.com/api/';
 class Renseigner_service extends React.Component{
 
     constructor(props){
@@ -71,7 +73,6 @@ class Renseigner_service extends React.Component{
         const { route } = this.props;
         this.params=route.params;
     };
-
     async showVenteCommercial() {
         const vente = await requete.fetchshowVenteCommercial(this.params.params.choixcmrcl, this.params.params.date, this.params.params.choixentreprise, this.params.params.choixproduit );
         console.log('TTTTTTest'+vente);
@@ -188,8 +189,10 @@ class Renseigner_service extends React.Component{
         const {params}  = route.params;
         const {backparams}  = route.params;
         console.log("parammmmmmmmmmmmms",params);
-        const URL1 ='http:tracking.socecepme.com/api/ventes/';
-        const URL = 'http:tracking.socecepme.com/api/photo';
+        //const URL1 ='http:tracking.socecepme.com/api/ventes/';
+        //const URL = 'http:tracking.socecepme.com/api/photo';
+        const URL1 =racine + 'ventes/';
+        const URL = racine + 'photo';
         let A, prix_unitairefssr=0, prix_unitaireconso=0, entreprisefssr, collectionfssr, produitfssr, fssr_interne='non'; 
 
         if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 && this.state.commentaire!=null && this.state.image!=null){
@@ -478,7 +481,8 @@ class Renseigner_service extends React.Component{
         const{route, navigation}=this.props;
         const {params}  = route.params;
         const {backparams}  = route.params;
-        const URL1 = 'http:tracking.socecepme.com/api/sauvegardephoto';
+        //const URL1 = 'http://tracking.socecepme.com/api/sauvegardephoto';
+        const URL1 = racine + 'sauvegardephoto'
         if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 || validation=="oui" && typeof backparams!=undefined && backparams.prix_unitaire>0 && backparams.state.qtite>0){
             if(this.state.image!=null || backparams.image!=null){
                 //sauvegarde du justif
@@ -540,7 +544,7 @@ class Renseigner_service extends React.Component{
                 body: raw,
                 redirect: 'follow'
             };
-            const URL='http://tracking.socecepme.com/api/sauvegardes';
+            const URL=racine+'sauvegardes';
             
             fetch(URL, requestOptions)
             .then(response => response.text())
@@ -626,9 +630,11 @@ class Renseigner_service extends React.Component{
             ref=this.state.old_reference;   
         }
 
-        const URL = 'http://tracking.socecepme.com/api/modifs_ventes';
-        const URL1 = 'http:tracking.socecepme.com/api/modifphoto';
-
+        //const URL = 'http://tracking.socecepme.com/api/modifs_ventes';
+        //const URL1 = 'http:tracking.socecepme.com/api/modifphoto';
+        const URL = racine + 'modifs_ventes';
+        const URL1 = racine + 'sauvegardephoto';
+        
         if(validation=="oui" && parseInt(this.state.prix_unitaire)>0 && parseInt(this.state.qtite)>0 && this.state.raison_modif!="none"  && this.state.newDate!="aucune nouvelle date choisie" && this.state.image!=null){
             
             //sauvegarde du justif

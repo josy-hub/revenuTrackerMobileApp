@@ -7,11 +7,14 @@ import { Button} from "../components";
 import { argonTheme } from '../constants';
 
 const { width, height } = Dimensions.get("screen");
+const racine = 'https://tracking.socecepme.com/api/';
 export default class Consulter_les_revenus extends Component {
   constructor(props) {
     super(props);
     this.state = {
       myArray: [],
+      header: [],
+      widthArr,
       url:'',
       isLoading:true
     }
@@ -36,17 +39,21 @@ export default class Consulter_les_revenus extends Component {
     var requestOptions = {
       method: 'GET',
       redirect: 'follow'
-      //isLoading:true
     };
 
-    fetch(`http://tracking.socecepme.com/api/consulter/${params.groupe}/${params.entreprise}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(racine + `consulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       var rslt = JSON.parse(result);
       console.log("rslttttt", rslt);
-      if(rslt['status']=='ok' && rslt['data'].length>0){
-        let myArray=rslt['data'];
-        this.setState({myArray, isLoading:false});
+      if(rslt['status']=='ok' && rslt['data'].length>0) {
+        let myArray = rslt['data'];
+        let header = rslt['header'];
+        let widthArr=[];
+        for(let i=0; i < header.length; i++) {
+          widthArr.push(100);
+        }
+        this.setState({myArray, isLoading:false, header, widthArr});
         //this.closeActivityIndicator();
       }
       else{
@@ -64,11 +71,11 @@ export default class Consulter_les_revenus extends Component {
       redirect: 'follow'
     };
 
-    fetch(`http://tracking.socecepme.com/api/exportconsulter/${params.groupe}/${params.entreprise}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions2)
+    fetch(racine + `exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions2)
     .then(response => response.text())
     .then(result => {
       var rslt = JSON.parse(result);
-      if(rslt['status']=='ok' && rslt['url'].length>0){
+      if(rslt['status']=='ok' && rslt['url'].length > 0){
         let url = rslt['url'];
         this.setState({url});
       }
@@ -94,7 +101,7 @@ export default class Consulter_les_revenus extends Component {
       redirect: 'follow'
     };
 
-    fetch(`http://192.168.8.101/Tracking/public/api/exportconsulter/${params.groupe}/${params.entreprise}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(racine + `exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       console.log(result);
@@ -120,13 +127,15 @@ export default class Consulter_les_revenus extends Component {
     const state = this.state;
     const { navigation, route } = this.props;
     const { params } = route.params;
-    let tableHead= ['Date','Reference de la vente','Statut de la vente','Groupe','Entreprise','categorie','produit', 'cuvee/batch','unite de mesure','fournisseur/type fournisseur','Prix de reference','prix de vente','remise','variation', 'quantite', 'total vente','Total M-1','Total N-1','YTD','LYTD','YTD var','commercial','commentaire commercial', 'remarques du responsable','nom du client', 'telephone du client', 'Email du client', 'Localiation du client'];
-    let widthArr=[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100];
+    let tableHead = state.header;
+    let widthArr = state.widthArr;
+    //let tableHead= ['Date','Reference de la vente','Statut de la vente','Groupe','Entreprise','categorie','produit', 'cuvee/batch','unite de mesure','fournisseur/type fournisseur','Prix de reference','prix de vente','remise','variation', 'quantite', 'total vente','Total M-1','Total N-1','YTD','LYTD','YTD var','commercial','commentaire commercial', 'remarques du responsable','nom du client', 'telephone du client', 'Email du client', 'Localiation du client'];
+    //let widthArr=[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100];
+    
     const {isLoading} = this.state;
-    console.log("parammmmmms",params);
     
     //cas commercial: un produit
-    if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie==null){
+    if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie === null){
     
       let tableData=[];
       state.myArray.map((item)=>
@@ -235,7 +244,7 @@ export default class Consulter_les_revenus extends Component {
       )
     }
     //commercial un produit d'une categorie
-    if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie!=null){
+    if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type === 8 && params.categorie !== null){
     
       let tableData=[];
       state.myArray.map((item)=>
@@ -312,7 +321,7 @@ export default class Consulter_les_revenus extends Component {
                   <Text  h1
                     style={styles.caption}
                   >
-                      Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
                   </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -344,7 +353,7 @@ export default class Consulter_les_revenus extends Component {
       )
     }
     //commercial:toutes ses ventes
-    else if(params.service_prdt=="toutprod" && params.categorie==null && params.user_type==8)
+    else if(params.service_prdt === "toutprod" && params.categorie === null && params.user_type === 8)
     {
 
       let tableData=[], test=0;
@@ -450,7 +459,7 @@ export default class Consulter_les_revenus extends Component {
      
     }
     //cas commercial, par categorie
-    else if(params.service_prdt=="toutprod" && params.categorie!=null && params.cuvee==null && params.user_type==8)
+    else if(params.service_prdt === "toutprod" && params.categorie !== null && params.cuvee === null && params.user_type === 8)
     {
 
       let tableData=[], test=0;
@@ -523,7 +532,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
+                  Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
                 </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>

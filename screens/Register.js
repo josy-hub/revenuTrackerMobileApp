@@ -62,7 +62,7 @@ class Register extends React.Component {
         body: raw,
         redirect: 'follow'
       };
-    //const racine = 'http://172.31.96.1/Tracking/public/api/';
+    //const racine = 'http://172.22.32.1/Tracking/public/api/';
     const racine = 'http://tracking.socecepme.com/api/';
     fetch(racine + 'login', requestOptions)
       .then(response => response.text())

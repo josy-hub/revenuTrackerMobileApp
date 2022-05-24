@@ -196,8 +196,20 @@ class Choix_service_consulter extends React.Component {
 
   onRangeDateChange = (newRangeDate) => {
     console.log(newRangeDate.startDate);
-   this.setState({startDate:newRangeDate.startDate});
-   this.setState({endDate:newRangeDate.endDate});
+    let bool = moment(newRangeDate.startDate).isSame(newRangeDate.endDate, 'year');
+    if(bool) {
+      this.setState({
+        startDate:newRangeDate.startDate,
+        endDate:newRangeDate.endDate,
+        etat:"good"
+      });
+    }
+    else{
+      alert('Desole plage de date beaucoup trop grande. Il s\'agira du traitement d\'une grande quantite de donnees qui ralentira le systeme. Nous vous conseillons de decouper la plage sur l\'intervalle d\'une annee.');
+      this.setState({
+        etat:"bad"
+      })
+    }
     
   }
   onRangeDateChangeRapport = (newRangeDate) => { 
@@ -223,7 +235,8 @@ class Choix_service_consulter extends React.Component {
     if (
       this.state.choixgrpe == "toutgrpe" &&
       this.state.startDate !="null"&&
-      this.state.endDate !="null"
+      this.state.endDate !="null" &&
+      this.state.etat=="good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
@@ -233,7 +246,8 @@ class Choix_service_consulter extends React.Component {
       this.state.choixgrpe != "toutgrpe" &&
       this.state.choixentrpse == "toutentr" &&
       this.state.startDate !="null"&&
-      this.state.endDate !="null"
+      this.state.endDate !="null" &&
+      this.state.etat=="good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
@@ -243,8 +257,9 @@ class Choix_service_consulter extends React.Component {
       this.state.choixgrpe != "toutgrpe" &&
       this.state.choixentrpse != "toutentr" &&
       this.state.choixprdt == "toutprod"&&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null"
+      this.state.startDate !="null" &&
+      this.state.endDate !="null" &&
+      this.state.etat=="good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
@@ -253,17 +268,18 @@ class Choix_service_consulter extends React.Component {
     else if (
       this.state.choixgrpe != "toutgrpe" &&
       this.state.choixentrpse != "toutentr" &&
-      this.state.choixprdt != "aucun produit/service"&&
-      this.state.choixprdt != "toutprod"&& 
-      this.state.startDate !="null"&&
-      this.state.endDate !="null"
+      this.state.choixprdt != "aucun produit/service" &&
+      this.state.choixprdt != "toutprod" && 
+      this.state.startDate != "null" &&
+      this.state.endDate != "null" &&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
       });
     } 
     else {
-      alert("Veuillez specifier vos choix avec une plage de date ou Renseignez tous les champs SVP");
+      alert("Veuillez specifier vos choix avec une plage de date sur une periode d'un an max ou Renseignez tous les champs SVP");
     } 
 
   }
@@ -302,19 +318,9 @@ class Choix_service_consulter extends React.Component {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact },
       });
     } 
-    /* else if (
-      this.state.choixgrpe != "toutgrpe" &&
-      this.state.choixentrpse != "toutentr" &&
-      this.state.choixprdt != "toutprod"&&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null"
-    ) {
-      alert("Desole vous ne pouvez consulter le rapport d'un seul produit");
-    }  */
     else {
       alert("Veuillez specifier vos choix avec une plage de date sur la periode d'un mois ou Renseignez tous les champs SVP");
     } 
-
   }
 
   render() {

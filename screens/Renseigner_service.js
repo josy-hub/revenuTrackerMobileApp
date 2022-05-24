@@ -28,13 +28,13 @@ const { width, height } = Dimensions.get("screen");
 let validation;
 
 const placeholder = {
-    /*label: 'choisir l'etat de la vente',
+    label: "Mode de paiement",
     value: null,
-    color: '#9EA0A4',*/
-  };
+    color: '#9EA0A4',
+};
 
-const racine = 'http://172.31.96.1/Tracking/public/api/';
-  //const racine = 'https:tracking.socecepme.com/api/';
+//const racine = 'http://172.22.32.1/Tracking/public/api/';
+const racine = 'https:tracking.socecepme.com/api/';
 class Renseigner_service extends React.Component{
 
     constructor(props){
@@ -68,7 +68,8 @@ class Renseigner_service extends React.Component{
           entreprise_email:'',
           entreprise_contact:'',
           entreprisesiege_social:'',
-          isLoading:true
+          isLoading:true,
+          mode_de_paie: null,
         };
         const { route } = this.props;
         this.params=route.params;
@@ -178,51 +179,25 @@ class Renseigner_service extends React.Component{
     closeActivityIndicator = () => setTimeout(() => this.setState({
         isLoading: false }), 60000)
     async suivant(){
-        const {isLoading} = this.state;
-        <ActivityIndicator
-            color="#00ff00"
-            size="large"
-            style = {styles.activityIndicator}
-            animating ={isLoading}
-        /> 
         const{route, navigation}=this.props;
         const {params}  = route.params;
         const {backparams}  = route.params;
-        console.log("parammmmmmmmmmmmms",params);
-        //const URL1 ='http:tracking.socecepme.com/api/ventes/';
-        //const URL = 'http:tracking.socecepme.com/api/photo';
+        console.log("mode paie",this.state.mode_de_paie);
+        
         const URL1 =racine + 'ventes/';
         const URL = racine + 'photo';
         let A, prix_unitairefssr=0, prix_unitaireconso=0, entreprisefssr, collectionfssr, produitfssr, fssr_interne='non'; 
-
-        if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 && this.state.commentaire!=null && this.state.image!=null){
+        
+        if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 && this.state.commentaire!=null && this.state.image!=null && this.state.mode_de_paie!=null){
 
            //enregistrement du justif
             var data = new FormData();
-            data.append('image', {
+            data.append('preuve', {
                 uri: this.state.image, // your file path string
                 name: '00206919-661e-469a-a19d-a8ba5587f5dc.jpg',
                 type: 'image/jpg'
             })
         
-            await fetch(URL, {
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data'
-                },
-                method: 'POST',
-                body: data
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                var rslt = JSON.parse(result);
-                console.log(rslt['url']);
-                if(rslt['status']=='ok'){
-                    let url = rslt['url'];
-                    this.setState({url});
-                }
-            });
             //enregistrement de la vente avec calcul de ratio dans le cas ou le fournisseur est interne
             if(params.choixtypefssr=='interne'){
                 fssr_interne='oui';
@@ -236,75 +211,67 @@ class Renseigner_service extends React.Component{
                const produits = await requete.fetchcalculprix(params.choixproduit);
                produits['produits'].map(item=>{item.raison_social==params.choixfssr? produitfssr=item:''});
                //enregistrement de la vente du fournisseur
-                collectionfssr={
-                    reference: 'lepass',
-                    quantite: this.state.qtite,
-                    preuve: this.state.url,
-                    etat: "en attente",
-                    prix_de_vente: prix_unitairefssr,
-                    commentaire_commercial: this.state.commentaire,
-                    raison_responsable:"RAS",
-                    user_id: params.user_id,
-                    produit_service_id: produitfssr.produit_id,
-                    date_vente: params.date,
-                    remise: this.state.remise,
-                    type_de_vente:  params.type_de_vente,
-                    poste: params.poste,
-                    groupe_de_vente_id: params.groupe_de_vente_id
-                
-                }
-                var myHeaders = new Headers();
-                myHeaders.append("Accept", "application/json");
-                myHeaders.append("Content-Type", "application/json");
-                var raw = JSON.stringify(collectionfssr);
+               data.append('reference', 'lepass')
+                data.append('quantite', this.state.qtite)
+                data.append('etat', 'en attente')
+                data.append('prix_de_vente', prix_unitairefssr)
+                data.append('commentaire_commercial', this.state.commentaire)
+                data.append('raison_responsable', 'RAS')
+                data.append('user_id', params.user_id)
+                data.append('produit_service_id', produitfssr.produit_id)
+                data.append('date_vente', params.date)
+                data.append('remise', this.state.remise)
+                data.append('type_de_vente', params.type_de_vente)
+                data.append('poste', params.poste)
+                data.append('mode_de_paiement', this.state.mode_de_paie)
+                data.append('groupe_de_vente_id', params.groupe_de_vente_id)
+
+                var myHeaders = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'multipart/form-data'
+                };
                 var requestOptions = {
                     method: 'POST',
                     headers: myHeaders,
-                    body: raw,
-                    redirect: 'follow'
-                };    
+                    body: data,
+                };   
 
-            await fetch(URL1+params.choixproduit+'/'+params.choixfssr, requestOptions)
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                var rslt = JSON.parse(result);
-                this.setState({ventefssr_id:rslt['ventes'].id});
-            })
-            .catch(error => console.log(error));
-
+                await fetch(URL1+params.choixproduit+'/'+params.choixfssr, requestOptions)
+                .then(response => response.text())
+                .then(result => {
+                    console.log(result);
+                    var rslt = JSON.parse(result);
+                    this.setState({ventefssr_id:rslt['ventes'].id});
+                })
+                .catch(error => console.log(error));
             }
             else if(params.choixtypefssr=='externe'){
                 entreprisefssr=params.fssrExt;
             }
-            let collection={
-                reference: 'lepass',
-                quantite: this.state.qtite,
-                preuve: this.state.url,
-                etat: "en attente",
-                prix_de_vente: prix_unitaireconso!=0? prix_unitaireconso:this.state.prix_unitaire,
-                commentaire_commercial: this.state.commentaire,
-                raison_responsable: "RAS",
-                user_id: params.user_id,
-                produit_service_id: this.state.produit_id,
-                date_vente: params.date,
-                remise: this.state.remise,
-                type_de_vente: params.type_de_vente,
-                groupe_de_vente_id: params.groupe_de_vente_id,
-                poste: params.poste,
-                
-            }
+            data.append('reference', 'lepass')
+            data.append('quantite', this.state.qtite)
+            data.append('etat', 'en attente')
+            data.append('prix_de_vente', prix_unitaireconso!=0? prix_unitaireconso:this.state.prix_unitaire)
+            data.append('commentaire_commercial', this.state.commentaire)
+            data.append('raison_responsable', 'RAS')
+            data.append('user_id', params.user_id)
+            data.append('produit_service_id', this.state.produit_id)
+            data.append('date_vente', params.date)
+            data.append('remise', this.state.remise)
+            data.append('type_de_vente', params.type_de_vente)
+            data.append('poste', params.poste)
+            data.append('mode_de_paiement', this.state.mode_de_paie)
+            data.append('groupe_de_vente_id', params.groupe_de_vente_id)
             
-            var myHeaders = new Headers();
-            myHeaders.append("Accept", "application/json");
-            myHeaders.append("Content-Type", "application/json");
-            var raw = JSON.stringify(collection);
+            var myHeaders = {
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data'
+            };
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
-            };    
+                body: data,
+            };     
 
             fetch(URL1+params.choixproduit+'/'+params.choixentreprise, requestOptions)
             .then(response => response.text())
@@ -336,25 +303,6 @@ class Renseigner_service extends React.Component{
                 name: '00206919-661e-469a-a19d-a8ba5587f5dc.jpg',
                 type: 'image/jpg'
             })
-        
-            await fetch(URL, {
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data'
-                },
-                method: 'POST',
-                body: data
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                var rslt = JSON.parse(result);
-                console.log(rslt['url']);
-                if(rslt['status']=='ok'){
-                    let url = rslt['url'];
-                    this.setState({url});
-                }
-            });
             
             //enregistrement de la vente sauvegardee avec calcul de ratio dans le cas ou le fournisseur est interne
             if(backparams.type_fournisseur=='interne'){
@@ -369,32 +317,30 @@ class Renseigner_service extends React.Component{
                const produits = await requete.fetchcalculprix(backparams.choixprdt);
                produits['produits'].map(item=>{item.raison_social==backparams.nom_fournisseur? produitfssr=item:''});
                //enregistrement de la vente du fournisseur
-                collectionfssr={
-                    reference:'lepass',
-                    quantite:this.state.qtite==null && backparams.qtite!=null?backparams.qtite:this.state.qtite,
-                    preuve:this.state.url==null && backparams.url!=null?backparams.url:this.state.url,
-                    etat:"en attente",
-                    prix_de_vente:prix_unitairefssr,
-                    commentaire_commercial:this.state.commentaire==null && backparams.commentaire!=null?backparams.commentaire:this.state.commentaire,
-                    raison_responsable:"RAS",
-                    user_id:params.user_id,
-                    produit_service_id:produitfssr.produit_id,
-                    date_vente:backparams.date!=null??backparams.date,
-                    remise:this.state.remise==null && backparams.remise!=null? backparams.remise:this.state.remise,
-                    type_de_vente:backparams.type_de_vente!=null??backparams.type_de_vente,
-                    groupe_de_vente_id:backparams.groupe_de_vente_id!=null??backparams.groupe_de_vente_id
-                
-                }
-                var myHeaders = new Headers();
-                myHeaders.append("Accept", "application/json");
-                myHeaders.append("Content-Type", "application/json");
-                var raw = JSON.stringify(collectionfssr);
+                data.append('reference', 'lepass')
+                data.append('quantite', this.state.qtite==null && backparams.qtite!=null?backparams.qtite:this.state.qtite)
+                data.append('etat', 'en attente')
+                data.append('prix_de_vente', prix_unitairefssr)
+                data.append('commentaire_commercial', this.state.commentaire==null && backparams.commentaire!=null?backparams.commentaire:this.state.commentaire)
+                data.append('raison_responsable', 'RAS')
+                data.append('user_id', params.user_id)
+                data.append('produit_service_id', produitfssr.produit_id)
+                data.append('date_vente', backparams.date!=null??backparams.date)
+                data.append('remise', this.state.remise==null && backparams.remise!=null? backparams.remise:this.state.remise)
+                data.append('type_de_vente', backparams.type_de_vente!=null??backparams.type_de_vente)
+                data.append('poste', params.poste)
+                data.append('mode_de_paiement', this.state.mode_de_paie==null && backparams.mode_de_paie!=null? backparams.mode_de_paie:this.state.mode_de_paie)
+                data.append('groupe_de_vente_id', backparams.groupe_de_vente_id!=null??backparams.groupe_de_vente_id)
+
+                var myHeaders = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'multipart/form-data'
+                };
                 var requestOptions = {
                     method: 'POST',
                     headers: myHeaders,
-                    body: raw,
-                    redirect: 'follow'
-                };    
+                    body: data,
+                };   
 
                 await fetch(URL1+backparams.choixprdt!=null??backparams.choixprdt+'/'+backparams.nom_fournisseur!=null??backparams.nom_fournisseur, requestOptions)
                 .then(response => response.text())
@@ -410,32 +356,29 @@ class Renseigner_service extends React.Component{
                 entreprisefssr=backparams.nom_fournisseur;
             }
             //enregistrement de la vente normale
-            let collection={
-                reference:'lepass',
-                quantite:this.state.qtite==null && backparams.qtite!=null?backparams.qtite:this.state.qtite,
-                preuve:this.state.url==null && backparams.url!=null?backparams.url:this.state.url,
-                etat:"en attente",
-                prix_de_vente:this.state.prix_unitaire<=0 && backparams.prix_unitaire>0?backparams.prix_unitaire:this.state.prix_unitaire,
-                commentaire_commercial:this.state.commentaire==null && backparams.commentaire!=null?backparams.commentaire:this.state.commentaire,
-                raison_responsable:"RAS",
-                user_id:params.user_id,
-                produit_service_id:this.state.produit_id ? this.state.produit_id:backparams.produit_id,
-                date_vente:backparams.newDate,
-                remise:this.state.remise==null && backparams.remise!=null? backparams.remise:this.state.remise,
-                type_de_vente:backparams.type_de_vente!=null??backparams.type_de_vente,
-                groupe_de_vente_id:backparams.groupe_de_vente_id!=null??backparams.groupe_de_vente_id
-                
-            }
+            data.append('reference', 'lepass')
+            data.append('quantite', this.state.qtite==null && backparams.qtite!=null?backparams.qtite:this.state.qtite)
+            data.append('etat', 'en attente')
+            data.append('prix_de_vente', this.state.prix_unitaire<=0 && backparams.prix_unitaire>0?backparams.prix_unitaire:this.state.prix_unitaire)
+            data.append('commentaire_commercial', this.state.commentaire==null && backparams.commentaire!=null?backparams.commentaire:this.state.commentaire)
+            data.append('raison_responsable', 'RAS')
+            data.append('user_id', params.user_id)
+            data.append('produit_service_id', this.state.produit_id ? this.state.produit_id:backparams.produit_id)
+            data.append('date_vente', backparams.newDate)
+            data.append('remise', this.state.remise==null && backparams.remise!=null? backparams.remise:this.state.remise)
+            data.append('type_de_vente', backparams.type_de_vente!=null??backparams.type_de_vente)
+            data.append('poste', params.poste)
+            data.append('mode_de_paiement', this.state.mode_de_paie==null && backparams.mode_de_paie!=null? backparams.mode_de_paie:this.state.mode_de_paie)
+            data.append('groupe_de_vente_id', backparams.groupe_de_vente_id!=null??backparams.groupe_de_vente_id)
     
-            var myHeaders = new Headers();
-            myHeaders.append("Accept", "application/json");
-            myHeaders.append("Content-Type", "application/json");
-            var raw = JSON.stringify(collection);
+            var myHeaders = {
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data'
+            };
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
+                body: data,
             };
     
             fetch(URL1+backparams.choixprdt!=null??backparams.choixprdt+'/'+backparams.choixentrpse!=null??backparams.choixentrpse, requestOptions)
@@ -459,17 +402,17 @@ class Renseigner_service extends React.Component{
             })
             .catch(error => Alert.alert("erreur sur le serveur: vos donnees n'ont pas pu etre enregistrees"));     
         }
-        else if(validation=='non' && parseInt(this.state.prix_unitaire)>=0 && parseInt(this.state.qtite)>0 && this.state.commentaire!=null && this.state.image!=null){
+        else if(validation=='non' && parseInt(this.state.prix_unitaire)>=0 && parseInt(this.state.qtite)>0 && this.state.commentaire!=null && this.state.image!=null && this.state.mode_de_paie!=null) {
             alert("vous ne pouvez pas vendre"+' '+ params.choixentreprise+' '+"a ce prix");
         }
-        else if(validation=='non' && parseInt(this.state.qtite)<=0 && this.state.commentaire!="none" && this.state.image!=null){
+        else if(validation=='non' && parseInt(this.state.qtite)<=0 && this.state.commentaire!="none" && this.state.image!=null && this.state.mode_de_paie!=null){
             alert("Les valeurs entrees ne sont pas valides");
         }
 
-        else if(validation=='non' && typeof backparams!=='undefined' && parseInt(backparams.prix_unitaire)>=0 && parseInt(backparams.qtite)>0 && backparams.commentaire!="none" && backparams.image!=null && backparams.choixprdt!=null){
+        else if(validation=='non' && typeof backparams!=='undefined' && parseInt(backparams.prix_unitaire)>=0 && parseInt(backparams.qtite)>0 && backparams.commentaire!="none" && backparams.image!=null && backparams.choixprdt!=null && this.state.mode_de_paie!=null){
             alert("vous ne pouvez pas vendre"+' '+ backparams.choixentrpse+' '+"a ce prix");
         }
-        else if(validation=='non' && typeof backparams!=='undefined' && parseInt(backparams.qtite)<=0 && backparams.commentaire!=null && backparams.image!=null && backparams.choixprdt!=null){
+        else if(validation=='non' && typeof backparams!=='undefined' && parseInt(backparams.qtite)<=0 && backparams.commentaire!=null && backparams.image!=null && backparams.choixprdt!=null && this.state.mode_de_paie!=null){
             alert("Les valeurs entrees ne sont pas valides");
         }
         else{
@@ -477,14 +420,13 @@ class Renseigner_service extends React.Component{
         }
     }
 
-    async sauvegarder(){
+    async sauvegarder() {
         const{route, navigation}=this.props;
         const {params}  = route.params;
         const {backparams}  = route.params;
-        //const URL1 = 'http://tracking.socecepme.com/api/sauvegardephoto';
         const URL1 = racine + 'sauvegardephoto'
         if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 || validation=="oui" && typeof backparams!=undefined && backparams.prix_unitaire>0 && backparams.state.qtite>0){
-            if(this.state.image!=null || backparams.image!=null){
+            /* if(this.state.image!=null || backparams.image!=null){
                 //sauvegarde du justif
                 var donnee = new FormData();
                 donnee.append('image', {
@@ -512,7 +454,8 @@ class Renseigner_service extends React.Component{
                     }
                 });
 
-            }
+            } */
+            Alert.alert('le mode sauvegarde ne sauvegarde pas les justifs.')
             let data={
                 groupe:this.params.params.choixgroupe,
                 entreprise:this.params.params.choixentreprise,
@@ -520,7 +463,8 @@ class Renseigner_service extends React.Component{
                 date_vente:this.params.params.date,
                 prix_unitaire:this.state.prix_unitaire,
                 quantite:this.state.qtite,
-                justificatif_vente:this.state.image!=null? this.state.url: this.state.image,
+                justificatif_vente: 'justif',
+                //justificatif_vente:this.state.image!=null? this.state.url: this.state.image,
                 commentaire:this.state.commentaire,
                 produit_id:this.state.produit_id,
                 user_contact:this.params.params.contact,
@@ -529,7 +473,6 @@ class Renseigner_service extends React.Component{
                 cuvee:this.params.params.cuvee,
                 type_fournisseur:this.params.params.choixtypefssr,
                 nom_fournisseur:this.params.params.choixfssr,
-                //fournisseur_id:this.params.params.fournisseur_id, 
                 remise:this.state.remise,
                 type_de_vente:this.params.params.type_de_vente,
                 groupe_de_vente_id:this.params.params.groupe_de_vente_id,
@@ -544,7 +487,7 @@ class Renseigner_service extends React.Component{
                 body: raw,
                 redirect: 'follow'
             };
-            const URL=racine+'sauvegardes';
+            const URL = racine + 'save/revfin';
             
             fetch(URL, requestOptions)
             .then(response => response.text())
@@ -574,16 +517,6 @@ class Renseigner_service extends React.Component{
     }
     sauvegardes(){
         this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:"renseignerservice"}})
-        /* this.setState({
-            prix_tot_ref:0,
-            prix_tot:0,
-            variation:0,
-            prix_unitaire:0,
-            qtite:0,
-            commentaire:null,
-            image: null,
-            remise:0
-        }) */
     }
     /*
     getsauvegarde=async()=>{
@@ -797,6 +730,12 @@ class Renseigner_service extends React.Component{
                                             iconContent={<Block />}
                                         />
                                     </Block>
+                                    <ActivityIndicator
+                                        color="#00ff00"
+                                        size="large"
+                                        style = {styles.activityIndicator}
+                                        animating ={isLoading}
+                                    /> 
                                 </Block>
                                 :
                                 <Block>
@@ -845,6 +784,32 @@ class Renseigner_service extends React.Component{
                                 <Text>OU</Text>
                                 <Button style={styles.uploadButton} onPress={this._pickImage} > CHOISIR LE JUSTIFICTIF DE LA VENTE </Button>
                                 {typeof backparams!=='undefined' && image==null ? backparams.image && <Image source={{ uri: backparams.image}} style={{ width: 200, height: 200 }} /> : image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+                            </Block>
+                            <Block>
+                                <Text>mode de paiement</Text>
+                                <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
+                                    <RNPickerSelect 
+                                        style={{
+                                            //placeholder: {color: "black"},
+                                            inputIOS: { color: "black" },
+                                            inputAndroid: { color: "black" },
+                                        }}
+                                        placeholder={placeholder}
+                                        placeholderTextColor="black"
+                                        value={this.state.mode_de_paie}
+                                        onValueChange={(value) => this.setState({mode_de_paie: value})}
+                                        items={[
+                                            {
+                                                label: 'comptant',
+                                                value: 1
+                                            },
+                                            {
+                                                label: 'a credit',
+                                                value: 2
+                                            },
+                                        ]}
+                                    />
+                                </Block>     
                             </Block>
                             <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
                                 <Input

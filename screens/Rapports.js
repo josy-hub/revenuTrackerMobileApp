@@ -8,7 +8,7 @@ import { Button } from "../components";
 import { argonTheme } from '../constants';
 
 const { width, height } = Dimensions.get("screen");
-
+const racine = 'https://tracking.socecepme.com/api/';
 export default class Rapports extends Component {
   constructor(props) {
     super(props);
@@ -41,25 +41,39 @@ export default class Rapports extends Component {
       redirect: 'follow'
     };
 
-    fetch(`http://tracking.socecepme.com/api/exportexcel/${params.groupe}/${params.entreprise}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(racine + `rapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       console.log(result);
       console.log(JSON.stringify(result, null, 4));
       var rslt = JSON.parse(result);
-      let url = rslt['url'];
-      let header=rslt['header'];
-      let body=rslt['body'];
-      let footer=rslt['footer'];
-      this.setState({url, header, body, footer, isLoading:false});
-      console.log(rslt['url']);
+      let header = rslt['header'];
+      let body = rslt['body'];
+      let footer = ['footer'];
+      this.setState({header, body, footer, isLoading:false});
       console.log(JSON.stringify(rslt['body']));
     })
     .catch(error => {
       console.log(error);
       alert("erreur de chargement des donnees");
     });
+
+    fetch(racine + `exportrapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    .then(response => response.text())
+    .then(result => {
+      console.log(result);
+      console.log(JSON.stringify(result, null, 4));
+      var rslt = JSON.parse(result);
+      let url = rslt['url'];
+      this.setState({url});
+      console.log(rslt['url']);
+    })
+    .catch(error => {
+      console.log(error);
+      alert("erreur de chargement des donnees");
+    });
   }
+
 
   render() {
     const state = this.state;
@@ -72,63 +86,118 @@ export default class Rapports extends Component {
     for(let i=0; i<state.header.length; i++){
       widthArr.push(180);
     }
-    //Rapport de vente de tous les produits d'une entreprise
-    if(params.service_prdt=="toutprod" && params.user_type>=2 && params.user_type<=8)
+    //Rapport de vente de tous les produits d'une entreprise et par categorie
+    if(params.service_prdt === "toutprod" && params.user_type>=2 && params.user_type<=8)
     {
-      
-      return (
-        <View style={styles.container}>
-          <Block  right>
-            <Button center color="default"
-              onPress={() => Linking.openURL(state.url)}
-              style={styles.optionsButtone}> 
-              EXPORTER
-            </Button>
-          </Block> 
-          <ScrollView horizontal={true} >
-            <View>
-              <Block>
-                <Text  h1
-                  style={styles.caption}
-                >
-                    Rapport des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
-                </Text>
-              </Block> 
-              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                    <Row data={state.header} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
-              </Table>
-              <ScrollView >
+      //par categorie
+      if(params.categorie !== null)  
+        return (
+          <View style={styles.container}>
+            <Block  right>
+              <Button center color="default"
+                onPress={() => Linking.openURL(state.url)}
+                style={styles.optionsButtone}> 
+                EXPORTER
+              </Button>
+            </Block> 
+            <ScrollView horizontal={true} >
+              <View>
+                <Block>
+                  <Text  h1
+                    style={styles.caption}
+                  >
+                      Rapport des ventes de: {params.entreprise} {params.categorie} du {params.startDate} au {params.endDate}
+                  </Text>
+                </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  {state.body.map((rowData,index)=>  
-                    <Row
-                      data={rowData}
-                      key={index}
-                      widthArr={widthArr}
-                      style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
-                      textStyle={styles.text}
-                    />
-                  )}
-                  {state.footer.map((rowData,index)=>  
-                    <Row
-                      data={rowData}
-                      key={index}
-                      widthArr={widthArr}
-                      style={styles.header}
-                      textStyle={styles.titleText}
-                    />
-                  )}
+                  <Row data={state.header} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
                 </Table>
-                <ActivityIndicator
-                  color="#00ff00"
-                  size="large"
-                  style = {styles.activityIndicator}
-                  animating ={isLoading}
-                />
-              </ScrollView>
-            </View>
-          </ScrollView>
-        </View>
-      );
+                <ScrollView >
+                  <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                    {state.body.map((rowData,index)=>  
+                      <Row
+                        data={rowData}
+                        key={index}
+                        widthArr={widthArr}
+                        style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
+                        textStyle={styles.text}
+                      />
+                    )}
+                    {state.footer.map((rowData,index)=>  
+                      <Row
+                        data={rowData}
+                        key={index}
+                        widthArr={widthArr}
+                        style={styles.header}
+                        textStyle={styles.titleText}
+                      />
+                    )}
+                  </Table>
+                  <ActivityIndicator
+                    color="#00ff00"
+                    size="large"
+                    style = {styles.activityIndicator}
+                    animating ={isLoading}
+                  />
+                </ScrollView>
+              </View>
+            </ScrollView>
+          </View>
+        )
+      else 
+        return (
+          <View style={styles.container}>
+            <Block  right>
+              <Button center color="default"
+                onPress={() => Linking.openURL(state.url)}
+                style={styles.optionsButtone}> 
+                EXPORTER
+              </Button>
+            </Block> 
+            <ScrollView horizontal={true} >
+              <View>
+                <Block>
+                  <Text  h1
+                    style={styles.caption}
+                  >
+                    Rapport des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
+                  </Text>
+                </Block> 
+                <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                  <Row data={state.header} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
+                </Table>
+                <ScrollView >
+                  <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                    {state.body.map((rowData,index)=>  
+                      <Row
+                        data={rowData}
+                        key={index}
+                        widthArr={widthArr}
+                        style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
+                        textStyle={styles.text}
+                      />
+                    )}
+                    {state.footer.map((rowData,index)=>  
+                      <Row
+                        data={rowData}
+                        key={index}
+                        widthArr={widthArr}
+                        style={styles.header}
+                        textStyle={styles.titleText}
+                      />
+                    )}
+                  </Table>
+                  <ActivityIndicator
+                    color="#00ff00"
+                    size="large"
+                    style = {styles.activityIndicator}
+                    animating ={isLoading}
+                  />
+                </ScrollView>
+              </View>
+            </ScrollView>
+          </View>
+        )
     }
 
     //Rapport de vente de toutes les entreprises d'un groupe
@@ -150,7 +219,7 @@ export default class Rapports extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Rapport des ventes de: {params.groupe} du {params.startDate} au {params.endDate}
+                  Rapport des ventes de: {params.groupe} du {params.startDate} au {params.endDate}
                 </Text>
               </Block> 
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>

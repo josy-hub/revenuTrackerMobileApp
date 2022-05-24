@@ -9,7 +9,7 @@ import moment from "moment";
 import {Button, Input} from "../components"
 import requete from '../services/Fetch'
 const { width, height } = Dimensions.get("screen");
-
+const racine = 'https://tracking.socecepme.com/api/';
 class Sauvegardes extends React.Component{
     constructor(props){
         super(props);
@@ -28,10 +28,10 @@ class Sauvegardes extends React.Component{
         if(sauvegardes.status=='ok' && sauvegardes.sauvegardes.length>0){
             let myArray=sauvegardes.sauvegardes;
             this.setState({ myArray});
-          }
-          else{
+        }
+        else{
             alert('desole pas de sauvegardes disponibles');
-          }      
+        }      
     
     }
     formatMillier( nombre){
@@ -42,7 +42,7 @@ class Sauvegardes extends React.Component{
           nombre = nombre.replace( reg, '$1' +sep +'$2');
         }
         return nombre;
-      }
+    }
     async continuer(groupe, entreprise, service, date, quantite, commentaire, prix_unitaire, justif, prix_ref, user_contact, produit_id, categorie, cuvee,remise, nom_fournisseur,type_fournisseur, type_de_vente, groupe_de_vente_id)
     {
         const{route}=this.props;
@@ -63,13 +63,6 @@ class Sauvegardes extends React.Component{
               }
               console.log('cccoolllection', collection);
               this.props.navigation.navigate('ChoixServiceRenseigner',{backparams:collection});
-              /*console.log("Cooooollection"+JSON.stringify(collection))
-              try{
-                  await AsyncStorage.setItem('collection', JSON.stringify(collection))
-                  this.props.navigation.navigate('ChoixServiceRenseigner',{backparams:collection});
-              } catch(e){
-                  Alert.alert("Erreur: impossible de continuer");
-              }   */ 
 
         }
         else if(params.place=="renseignerservice"){          
@@ -96,36 +89,29 @@ class Sauvegardes extends React.Component{
                 groupe_de_vente_id:groupe_de_vente_id
 
             }
-            this.props.navigation.navigate('RenseignerService',{backparams:elements});
-            /*try{
-                await AsyncStorage.setItem('elements', JSON.stringify(elements))
-                this.props.navigation.navigate('RenseignerService');
-            } catch(e){
-                Alert.alert("Erreur: impossible de continuer");
-            } */      
+            this.props.navigation.navigate('RenseignerService',{backparams:elements});      
         }
         
     }
     annuler(key, id){
+        Alert.alert('Vous etes sur le point de supprimer definitivement cette sauvegarde.')
         this.setState({annuler:true, key:key});
         var requestOptions = {
             method: 'DELETE',
             redirect: 'follow'
-          };
+        };
           
-          fetch(`http://tracking.socecepme.com/api/sauvegardes/${id}`, requestOptions)
-            .then(response => response.text())
-            .then(result =>{ 
-                console.log(result)
-                alert("Sauvegardes supprimee avec succes")
-            })
-            .catch(error => console.log('error', error));
+        fetch(racine + `sauvegarde/delete/${id}`, requestOptions)
+        .then(response => response.text())
+        .then(result =>{ 
+            console.log(result)
+            alert("Sauvegardes supprimee avec succes")
+        })
+        .catch(error => console.log('error', error));
     }
     render(){
         const{route, navigation}=this.props;
         const params  = route.params;
-        /* var time = moment("21-01-2021").format("YYYY-MM-DD hh:mm:ss")
-        console.log(time); */
         return(
             <Block style={styles.global_container}>
                 <ScrollView>

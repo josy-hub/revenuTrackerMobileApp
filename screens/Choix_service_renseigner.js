@@ -60,8 +60,8 @@
   let mindate=now-549094194;
   let mindatef=new Date(mindate);
 
-  const racine = 'http://172.31.96.1/Tracking/public/api/';
-  //const racine = 'https:tracking.socecepme.com/api/';
+  //const racine = 'http://172.31.96.1/Tracking/public/api/';
+  const racine = 'https://tracking.socecepme.com/api/';
   class Choix_service_renseigner extends React.Component {
     
     constructor(props){
@@ -309,7 +309,6 @@
     OnDateChange = (newDate) => {
       let convertedDate=moment(newDate).format("YYYY-MM-DD")
       this.setState({newDate:convertedDate});  
-   
     }
     
     
@@ -319,6 +318,7 @@
       var s = date.getSeconds();
       var m= date.getMinutes();
       var h= date.getHours();
+  
       if(this.state.choixgrpe!=null || typeof backparams!=='undefined' && backparams.choixgrpe!=null){
         let data={
           groupe:this.state.choixgrpe==null?backparams.choixgrpe:backparams.choixgrpe,
@@ -335,10 +335,10 @@
           categorie:this.state.categorie,
           cuvee:this.state.choixcuvee,
           remise:null,
-          //fournisseur_id:fssr_id==0? this.state.fssr_id : fssr_id,
           type_fournisseur:this.state.choixtypefssr,
           nom_fournisseur:this.state.fsseurExt!=null?this.state.fsseurExt:this.state.choixfssr,
           type_de_vente:this.state.type_vente,
+          mode_de_paiement:null,
           groupe_de_vente_id:this.state.type_vente=='groupee'?date+':'+h+':'+m+':'+s:null
 
         }
@@ -352,7 +352,7 @@
             body: raw,
             redirect: 'follow'
         };
-        const URL=`${racine}sauvegardes`;
+        const URL=`${racine}sauvegarde`;
         
         fetch(URL, requestOptions)
         .then(response => response.text())
@@ -421,6 +421,7 @@
           params: {
             "user_id":params.user_id,
             "user_type":params.user_type,
+            "poste": params.poste,
             "choixgroupe":this.state.choixgrpe, 
             "choixentreprise":this.state.choixentrpse,
             "choixproduit":this.state.choixprdt, 

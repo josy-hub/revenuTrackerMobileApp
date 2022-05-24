@@ -87,7 +87,7 @@ class Home extends React.Component {
                           onPress={() =>
                             this.props.navigation.navigate(
                               "ChoixServiceRenseigner",{
-                                params: {"user_id":params.id, "nom":params.nom, "contact":params.contact, "user_type":params.type,"entreprise_id":params.entreprise_id}
+                                params: {"user_id":params.id, "nom":params.nom, "contact":params.contact, "user_type":params.type,"entreprise_id":params.entreprise_id, 'poste': params.poste}
                               } 
                             )
                           }

@@ -22,7 +22,7 @@ const placeholder = {
     value: null,
     color: '#9EA0A4',*/
   };
-const API = 'http://tracking.socecepme.com/api';
+const API = 'https://tracking.socecepme.com/api';
 
 class Info_client extends React.Component{
 
@@ -37,7 +37,7 @@ class Info_client extends React.Component{
           clients: [],
           //query: '',
           hide:false,
-          isLoading:true
+          isLoading:false
         };
         const { route } = this.props;
         this.params=route.params;
@@ -46,6 +46,7 @@ class Info_client extends React.Component{
     componentDidMount() {
         fetch(`${API}/clients`).then(res => res.json()).then((json) => {
           const {clients } = json;
+          console.log('clientssss',json)
           this.setState({ clients });
         });
     }
@@ -77,13 +78,7 @@ class Info_client extends React.Component{
         return Nomf;
     }
     envoyer(){
-        const{isLoading}=this.state;
-        <ActivityIndicator
-            color="#00ff00"
-            size="large"
-            style = {styles.activityIndicator}
-            animating ={isLoading}
-        /> 
+        this.setState({ isLoading: true }) 
         
         if(this.state.nom!="client lamda" && this.state.nom!="client tierce"&& this.state.email!="client@client.com" && this.state.localisation!='client lamda', this.state.contact!="000000000"){
             //enregistrement du client interne
@@ -112,7 +107,7 @@ class Info_client extends React.Component{
             formData.append("contact", this.state.contact);
             formData.append("localisation", this.state.localisation);
             formData.append("vente_id", this.params.params.vente_id);
-            fetch('http://tracking.socecepme.com/api/clients', {  
+            fetch('https://tracking.socecepme.com/api/clients', {  
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
@@ -133,7 +128,7 @@ class Info_client extends React.Component{
                 data.append("contact", this.params.params.contact);
                 data.append("localisation", this.params.params.siege_social);
                 data.append("vente_id", this.params.params.ventefssr_id);
-                fetch('http://tracking.socecepme.com/api/clients', {  
+                fetch('https://tracking.socecepme.com/api/clients', {  
                     method: 'POST',
                     body: data
                 }).then(response => response.text())
@@ -150,7 +145,7 @@ class Info_client extends React.Component{
             formData.append("contact", this.state.contact);
             formData.append("localisation", this.state.localisation);
             formData.append("vente_id", this.params.params.vente_id);
-            fetch('http://tracking.socecepme.com/api/clients', {  
+            fetch('https://tracking.socecepme.com/api/clients', {  
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
@@ -297,16 +292,14 @@ class Info_client extends React.Component{
                     <Block flex={1.25} right>
                         <Button center color="default" 
                             style={styles.optionsButtonr} 
-                            onPress={() => {
-                                <ActivityIndicator
-                                    color="#00ff00"
-                                    size="large"
-                                    style = {styles.activityIndicator}
-                                    animating ={isLoading}
-                                /> ,
-                                this.envoyer()
-                            }}>
+                            onPress={() => this.envoyer() }>
                             ENVOYER
+                            <ActivityIndicator
+                                color="#00ff00"
+                                size="large"
+                                style = {styles.activityIndicator}
+                                animating ={isLoading}
+                            /> 
                         </Button>
                     </Block>
                 </ScrollView>

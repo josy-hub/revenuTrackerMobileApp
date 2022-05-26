@@ -9,42 +9,41 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 class DrawerItem extends React.Component {
   renderIcon = () => {
     const { title, focused } = this.props;
+    const screens = [
+      "Home",
+      "Commissions",
+      "Mes paramètres",
+      "Notifications",
+      "Deconnexion"        
+    ];
 
     switch (title) {
       case "Home":
         return (
-          <Icon
+          <Icon                                       
             name="shop"
             family="ArgonExtra"
             size={14}
             color={focused ? "white" : argonTheme.COLORS.PRIMARY}
           />
         );
-      case "A propos":
+      case "Commissions":
         return (<Icon
-          name="spaceship"
+          name="chart-pie-35"
+          family="ArgonExtra"
+          size={14}
+          color={focused ? "white" : argonTheme.COLORS.WARNING}
+        />);
+      case "Mes paramètres":
+        return (<Icon
+          name="chart-pie-35"
           family="ArgonExtra"
           size={14}
           color={focused ? "white" : "rgba(0,0,0,0.5)"}
         />);
-
-        case "Commissions":
+      case "A propos":
         return (<Icon
-          name="chart-pie-35"
-          family="ArgonExtra"
-          size={14}
-          color={focused ? "white" : argonTheme.COLORS.WARNING}
-        />);
-        /*case "Services récents":
-        return (<Icon
-          name="map-big"
-          family="ArgonExtra"
-          size={14}
-          color={focused ? "white" : argonTheme.COLORS.WARNING}
-        />);*/
-        case "Mes paramètres":
-        return (<Icon
-          name="chart-pie-35"
+          name="spaceship"
           family="ArgonExtra"
           size={14}
           color={focused ? "white" : "rgba(0,0,0,0.5)"}

@@ -272,7 +272,7 @@ class Header extends React.Component {
           ]}
           {...props}
         />
-        {this.renderHeader()}
+        {/* {this.renderHeader()} */}
       </Block>
     );
   }

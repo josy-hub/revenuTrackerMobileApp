@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Block, theme, Icon } from "galio-framework";
 
-const API = 'http://tracking.socecepme.com/api';//'http://tracking.socecepme.com/api';
+const API = 'https://tracking.socecepme.com/api';
 //const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
 
 class AutocompleteExample extends Component {

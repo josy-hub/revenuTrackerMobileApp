@@ -70,7 +70,7 @@ class Choix_service_consulter extends React.Component {
       service:[],
       choixentrpse: "toutentr",
       choixprdt: "toutprod",
-      choixcat:null,
+      categorie:'categorie',
       choixcuvee:null,
       date: now,
       startDate:"null",
@@ -233,36 +233,36 @@ class Choix_service_consulter extends React.Component {
   envoyerConsulter() {
 
     if (
-      this.state.choixgrpe == "toutgrpe" &&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null" &&
-      this.state.etat=="good"
+      this.state.choixgrpe === "toutgrpe" &&
+      this.state.startDate !== "null"&&
+      this.state.endDate !== "null" &&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
       });
     }
     else if (
-      this.state.choixgrpe != "toutgrpe" &&
-      this.state.choixentrpse == "toutentr" &&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null" &&
-      this.state.etat=="good"
+      this.state.choixgrpe !== "toutgrpe" &&
+      this.state.choixentrpse === "toutentr" &&
+      this.state.startDate !== "null"&&
+      this.state.endDate !== "null" &&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
       });
     } 
     else if (
-      this.state.choixgrpe != "toutgrpe" &&
-      this.state.choixentrpse != "toutentr" &&
-      this.state.choixprdt == "toutprod"&&
-      this.state.startDate !="null" &&
-      this.state.endDate !="null" &&
-      this.state.etat=="good"
+      this.state.choixgrpe !== "toutgrpe" &&
+      this.state.choixentrpse !== "toutentr" &&
+      this.state.choixprdt === "toutprod"&&
+      this.state.startDate !== "null" &&
+      this.state.endDate !== "null" &&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":this.state.categorie, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
       });
     } 
     else if (
@@ -275,13 +275,12 @@ class Choix_service_consulter extends React.Component {
       this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":this.state.categorie, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
       });
     } 
     else {
       alert("Veuillez specifier vos choix avec une plage de date sur une periode d'un an max ou Renseignez tous les champs SVP");
     } 
-
   }
   envoyerRapport(){
    
@@ -292,30 +291,30 @@ class Choix_service_consulter extends React.Component {
       this.state.etat=="good"
     ) {
       this.props.navigation.navigate("Rapports", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact },
       });
     } 
     else if (
-      this.state.choixgrpe != "toutgrpe" &&
+      this.state.choixgrpe !== "toutgrpe" &&
       this.state.choixentrpse === "toutentr" &&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null"&&
-      this.state.etat=="good"
+      this.state.startDate !== "null"&&
+      this.state.endDate !== "null"&&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("Rapports", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":"service", "contact":this.params.params.contact },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact },
       });
     } 
     else if (
-      this.state.choixgrpe != "toutgrpe" &&
-      this.state.choixentrpse != "toutentr" &&
-      //this.state.choixprdt === "toutprod"&&
-      this.state.startDate !="null"&&
-      this.state.endDate !="null"&&
-      this.state.etat=="good"
+      this.state.choixgrpe !== "toutgrpe" &&
+      this.state.choixentrpse !== "toutentr" &&
+      this.state.categorie !== "categorie" &&
+      this.state.startDate !== "null" &&
+      this.state.endDate !== "null"&&
+      this.state.etat === "good"
     ) {
       this.props.navigation.navigate("Rapports", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact },
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt,"categorie":this.state.categorie, "contact":this.params.params.contact },
       });
     } 
     else {
@@ -343,7 +342,7 @@ class Choix_service_consulter extends React.Component {
               Renseigner les champs
             </Text>
           </Block>
-          { params.rapport==="non"?
+          { params.rapport === "non"?
             <Block>
               <Block space="between" style={styles.choix_card}>
                 <Text>Choisir un groupe</Text>
@@ -376,7 +375,7 @@ class Choix_service_consulter extends React.Component {
                   />
                 </Block>
                 {
-                  (this.state.choixentrpse=='KmerFood'||this.state.choixentrpse=='Agripeel'||this.state.choixentrpse=='Wecare SCI')?
+                  (this.state.choixentrpse === 'KmerFood' || this.state.choixentrpse === 'Agripeel' || this.state.choixentrpse === 'WecareFood')?
                   <Block>
                     <Text >Choisir une categorie de produit</Text>
                     <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
@@ -421,6 +420,37 @@ class Choix_service_consulter extends React.Component {
                       />  
                     </Block>
                   </Block>:
+                  ( this.state.choixentrpse === 'Wecare SCI' || this.state.choixentrpse === 'PEEX' || this.state.choixentrpse === 'Tropical' || this.state.choixentrpse === 'Wecare Logistic')?
+                  <Block>
+                    <Text >Choisir une categorie de produit</Text>
+                    <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+                      <RNPickerSelect
+                        style={{
+                        // placeholder: {color: "black"},
+                          inputIOS: { color: "black" },
+                          inputAndroid: { color: "black" },
+                        }}
+                        placeholder={placeholder4}
+                        value={this.state.choixcat}
+                        onValueChange={(value) => this.choixservice(value)}
+                        items={this.state.categories}
+                      /> 
+                    </Block>
+                    <Text>Choisir un service/produit</Text>
+                    <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>
+                        <RNPickerSelect
+                          style={{
+                            //placeholder: {color: "black"},
+                            inputIOS: { color: "black" },
+                            inputAndroid: { color: "black" },
+                          }}
+                          placeholder={placeholder3}
+                          value={this.state.choixprdt} 
+                          onValueChange={(value) =>this.choixcuvee(value) }
+                          items={this.state.service}
+                        />  
+                    </Block>
+                  </Block>:
                   <Block>
                     <Text>Choisir un service</Text>
                     <Block card>
@@ -438,7 +468,6 @@ class Choix_service_consulter extends React.Component {
                     </Block>
                   </Block>
                 }
-                
                 <Block
                   style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 20 }}
                 >
@@ -489,21 +518,70 @@ class Choix_service_consulter extends React.Component {
                     items={this.state.entreprises}
                   />
                 </Block>
-                {/* <Text>Choisir un service</Text>
-                <Block card>
-                  <RNPickerSelect
-                    style={{
-                      //placeholder: {color: "black"},
-                      inputIOS: { color: "black" },
-                      inputAndroid: { color: "black" },
-                    }}
-                    placeholder={placeholder3}
-                    onValueChange={(value) => this.setState({ choixprdt: value })}
-                    items={this.state.services}
-                    placeholderTextColor="black"
-                    disabled
-                  />
-                </Block> */}
+                {( this.state.choixentrpse === 'Wecare SCI' ||
+                  this.state.choixentrpse === 'PEEX' ||
+                  this.state.choixentrpse === 'Tropical' ||
+                  this.state.choixentrpse === 'KmerFood' ||
+                  this.state.choixentrpse === 'WecareFood' ||
+                  this.state.choixentrpse === 'Agripeel' ||
+                  this.state.choixentrpse === 'Wecare Logistic'
+                )?
+                  <Block>
+                    <Text>Choisir une categorie</Text>
+                    <Block card>
+                      <RNPickerSelect
+                        style={{
+                          //placeholder: {color: "black"},
+                          inputIOS: { color: "black" },
+                          inputAndroid: { color: "black" },
+                        }}
+                        placeholder={placeholder3}
+                        onValueChange={(value) => this.setState({ categorie: value })}
+                        items={this.state.categories}
+                        placeholderTextColor="black"
+                        disabled
+                      />
+                    </Block>
+                    <Text>Choisir un service</Text>
+                    <Block card>
+                      <RNPickerSelect
+                        style={{
+                          //placeholder: {color: "black"},
+                          inputIOS: { color: "black" },
+                          inputAndroid: { color: "black" },
+                        }}
+                        placeholder={placeholder3}
+                        onValueChange={(value) => this.setState({ choixprdt: value })}
+                        items={[{
+                          label: "tout",
+                          value: "toutprod"
+                        }]}
+                        placeholderTextColor="black"
+                        disabled
+                      />
+                    </Block>
+                  </Block>:
+                  <Block>
+                    <Text>Choisir un service</Text>
+                    <Block card>
+                      <RNPickerSelect
+                        style={{
+                          //placeholder: {color: "black"},
+                          inputIOS: { color: "black" },
+                          inputAndroid: { color: "black" },
+                        }}
+                        placeholder={placeholder3}
+                        onValueChange={(value) => this.setState({ choixprdt: value })}
+                        items={[{
+                          label: "tout",
+                          value: "toutprod"
+                        }]}
+                        placeholderTextColor="black"
+                        disabled
+                      />
+                    </Block>
+                  </Block>
+                }
                 <Block
                   style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 20 }}
                 >

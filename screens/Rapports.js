@@ -41,10 +41,10 @@ export default class Rapports extends Component {
       redirect: 'follow'
     };
 
-    fetch(racine + `rapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(`${racine}rapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
-      console.log(result);
+      console.log('rapport' + result);
       console.log(JSON.stringify(result, null, 4));
       var rslt = JSON.parse(result);
       let header = rslt['header'];
@@ -58,7 +58,7 @@ export default class Rapports extends Component {
       alert("erreur de chargement des donnees");
     });
 
-    fetch(racine + `exportrapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(`${racine}exportrapport/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       console.log(result);
@@ -90,7 +90,7 @@ export default class Rapports extends Component {
     if(params.service_prdt === "toutprod" && params.user_type>=2 && params.user_type<=8)
     {
       //par categorie
-      if(params.categorie !== null)  
+      if(params.categorie !== "categorie" && params.categorie !== "toutcat")  
         return (
           <View style={styles.container}>
             <Block  right>
@@ -201,7 +201,7 @@ export default class Rapports extends Component {
     }
 
     //Rapport de vente de toutes les entreprises d'un groupe
-    else if(params.entreprise=="toutentr" && params.user_type>=2 && params.user_type<=8)
+    else if(params.entreprise === "toutentr" && params.user_type >= 2 && params.user_type <= 8)
     {       
       
       return (
@@ -260,7 +260,7 @@ export default class Rapports extends Component {
     }
 
     //Rapport de vente de tous les groupes de la holding
-    else if(params.groupe=="toutgrpe" && params.user_type>=2 && params.user_type<=8)
+    else if(params.groupe === "toutgrpe" && params.user_type >= 2 && params.user_type <= 8)
     {
       
       return (

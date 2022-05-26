@@ -99,7 +99,7 @@ class Reset_passord extends React.Component {
                       onPress={() =>this.envoyer()}
                       >
                       <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          ENVOYER
+                        ENVOYER
                       </Text>
                     </Button>
                   </Block>

@@ -13,12 +13,14 @@ function CustomDrawerContent({ drawerPosition, navigation, profile, focused, sta
   const insets = useSafeArea();
   const screens = [
     "Home",
-    "Commissions",
-    "Mes paramètres",
     "Notifications",
-    "Deconnexion"        
+    "Commissions",
+    "ResetPassword",
+    "Mes paramètres",
+    "A propos",
+    "Connexion",        
   ];
-  console.log(state.index)
+  console.log(state.routeNames)
   return (
     <Block
       style={styles.container}
@@ -34,16 +36,17 @@ function CustomDrawerContent({ drawerPosition, navigation, profile, focused, sta
       <Block flex style={{ paddingLeft: 8, paddingRight: 14 }}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {screens.map((item, index) => {
-              return (
+            return (
+              item !== "A propos" && item !== "ResetPassword" && 
                 <DrawerCustomItem
-                  title={item == "Deconnexion" ? "Connexion" : item}
+                  title={item === "Deconnexion" ? "Connexion" : item}
                   key={index}
                   navigation={navigation}
                   state={state}
                   focused={state.index === index ? true : false}
                 />
-              );
-            })}
+            );
+          })}
             
             <Block flex style={{ marginTop: 24, marginVertical: 8, paddingHorizontal: 8 }}>
               <Block style={{ borderColor: "rgba(0,0,0,0.2)", width: '100%', borderWidth: StyleSheet.hairlineWidth }}/>

@@ -34,9 +34,11 @@
     "expo-notifications": "^0.14.1",
     "expo-permissions": "^13.1.1",
     "expo-status-bar": "~1.2.0",
+    "expo-updates": "~0.11.7",
     "galio-framework": "^0.8.0",
     "moment": "^2.29.2",
     "moment-range": "^4.0.2",
+    "native-base": "^3.4.5",
     "prop-types": "^15.8.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -60,8 +62,10 @@
     "redux": "^4.2.0",
     "rn-fetch-blob": "^0.12.0",
     "source-map-js": "^1.0.2",
+    "styled-components": "^5.3.5",
+    "styled-system": "^5.1.5",
     "workbox-build": "^6.5.3",
-    "expo-updates": "~0.11.7"
+    "react-native-svg": "12.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

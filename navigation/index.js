@@ -391,7 +391,7 @@ function AppDrawer(props) {
         backgroundColor: "white",
         width: width * 0.8,
       }}
-      drawerContentOptions={{
+      screenOptions={{
         activeTintcolor: "white",
         inactiveTintColor: "#000",
         activeBackgroundColor: "transparent",
@@ -414,12 +414,12 @@ function AppDrawer(props) {
       initialRouteName="Connexion"
     >
       <Drawer.Screen name="Home" component={HomeStack} />
-      <Drawer.Screen name="Connexion" component={Register} />
       <Drawer.Screen name="Notifications" component={NotificationStack} />
       <Drawer.Screen name="Commissions" component={CommissionStack} />
       <Drawer.Screen name="ResetPassword" component={ResetPassword} />
       <Drawer.Screen name="Mes paramètres" component={ParametreStack} />
       <Drawer.Screen name="A propos" component={AproposStack} />
+      <Drawer.Screen name="Connexion" component={Register} />
     </Drawer.Navigator>
   );
 }

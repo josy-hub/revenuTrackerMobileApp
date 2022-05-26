@@ -11,6 +11,9 @@ import {
 import Storage from 'react-native-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Block , Text,theme} from "galio-framework";
+import { Button, Modal, Center, Spinner} from "native-base";
+
+
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
@@ -20,7 +23,7 @@ import moment from "moment";
 import Day from '../services/Date';
 
 import requete from '../services/Fetch'
-import { Button,  Input } from "../components";
+import { Input } from "../components";
 import { argonTheme } from "../constants";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -68,8 +71,9 @@ class Renseigner_service extends React.Component{
           entreprise_email:'',
           entreprise_contact:'',
           entreprisesiege_social:'',
-          isLoading:true,
+          isLoading:false,
           mode_de_paie: null,
+          showModal: false,
         };
         const { route } = this.props;
         this.params=route.params;
@@ -187,7 +191,8 @@ class Renseigner_service extends React.Component{
         const URL1 =racine + 'ventes/';
         const URL = racine + 'photo';
         let A, prix_unitairefssr=0, prix_unitaireconso=0, entreprisefssr, collectionfssr, produitfssr, fssr_interne='non'; 
-        
+        this.setState({ isLoading: true })
+
         if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 && this.state.commentaire!=null && this.state.image!=null && this.state.mode_de_paie!=null){
 
            //enregistrement du justif
@@ -658,12 +663,12 @@ class Renseigner_service extends React.Component{
         let { image } = this.state;
         let { prix_unitaire }=this.state;
         let { qtite }=this.state;
-        const{route, navigation}=this.props;
-        const {params}  = route.params;
+        const{ route, navigation }=this.props;
+        const { params }  = route.params;
         console.log(params);
         console.log(qtite);
-        const {backparams}  = route.params;
-        const {isLoading} = this.state;
+        const { backparams }  = route.params;
+        const { isLoading } = this.state;
         
         //renseigner les revenus
         if(this.params.params.type=="renseigner"){
@@ -845,38 +850,60 @@ class Renseigner_service extends React.Component{
                         </Block>
                         <Block style={{flexDirection:"row", justifyContent:"space-between", marginTop:10}}>
                             <Block /* flex={1.25} left */ style={{justifyContent:"flex-start"}}>
-                            <Button  
-                                style={styles.optionsButtonl} 
-                                onPress={() =>{this.sauvegardes()}}
-                            >
-                                SAUVEGARDES
-                            </Button>
+                                <Button  
+                                    style={styles.optionsButtonl} 
+                                    onPress={() =>{this.sauvegardes()}}
+                                >
+                                    SAUVEGARDES
+                                </Button>
                             </Block>
                             <Block /* flex={1.25} center */ style={{justifyContent:"center"}}>
-                            <Button  
-                                style={styles.optionsButtonm} 
-                                onPress={() =>{this.sauvegarder()}}
-                            >
-                                SAUVEGARDER
-                            </Button>
+                                <Button  
+                                    style={styles.optionsButtonm} 
+                                    onPress={() =>{this.sauvegarder()}}
+                                >
+                                    SAUVEGARDER
+                                </Button>
                             </Block> 
                             <Block /* flex={1.25} right */style={{justifyContent:"flex-end"}}>
-                            <Button center color="default" 
-                                style={styles.optionsButtonr} 
-                                onPress={() =>{
-                                <ActivityIndicator
-                                    color="#00ff00"
-                                    size="large"
-                                    style = {styles.activityIndicator}
-                                    animating ={isLoading}
-                                />,
-                                this.suivant()
-                            }}
-                            >
-                                SUIVANT
-                            </Button>
+                                <Button center color="default" 
+                                    style={styles.optionsButtonr} 
+                                    onPress={() =>{
+                                    {/* <ActivityIndicator
+                                        color="#00ff00"
+                                        size="large"
+                                        style = {styles.activityIndicator}
+                                        animating ={isLoading}
+                                    />, */}
+                                    this.state.showModal(true)
+                                }}
+                                >
+                                    SUIVANT
+                                </Button>
                             </Block>
                         </Block>
+                        <Modal isOpen={this.state.showModal} onClose={() => this.setState({showModal: false})}>
+                            <Modal.Content maxWidth="400px">
+                                <Modal.CloseButton />
+                                <Modal.Header>Recapitulatif de la vente</Modal.Header>
+                                <Modal.Body>
+                                    <Text>groupe: {params.choixgroupe}</Text>
+                                    <Text>entreprise: {params.choixentreprise}</Text>
+                                    <Text>date: {params.date}</Text>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button.Group variant="ghost" space={2}>
+                                    <Button>REPRENDRE</Button>
+                                    <Button onPress={() => {
+                                        this.suivant()
+                                    }}>
+                                        SUIVANT
+                                        {/* <Spinner animating ={isLoading} color="emerald.500" /> */}
+                                    </Button>
+                                    </Button.Group>
+                                </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
                     </ScrollView>           
                 </Block>
             )

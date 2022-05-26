@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "RevTackerMobileApp",
+    "name": "LH Revenu Tracker",
     "slug": "RevTackerMobileApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -29,6 +29,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": "My webpack project"
+    "description": "LH Revenu Tracker, by Wecare Technology"
   }
 }

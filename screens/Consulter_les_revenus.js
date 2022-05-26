@@ -41,7 +41,7 @@ export default class Consulter_les_revenus extends Component {
       redirect: 'follow'
     };
 
-    fetch(racine + `consulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(`${racine}consulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       var rslt = JSON.parse(result);
@@ -71,7 +71,7 @@ export default class Consulter_les_revenus extends Component {
       redirect: 'follow'
     };
 
-    fetch(racine + `exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions2)
+    fetch(`${racine}exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions2)
     .then(response => response.text())
     .then(result => {
       var rslt = JSON.parse(result);
@@ -101,7 +101,7 @@ export default class Consulter_les_revenus extends Component {
       redirect: 'follow'
     };
 
-    fetch(racine + `exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
+    fetch(`${racine}exportconsulter/${params.groupe}/${params.entreprise}/${params.categorie}/${params.service_prdt}/${params.user_id}/${params.user_type}/${params.contact}/${params.startDate}/${params.endDate}`, requestOptions)
     .then(response => response.text())
     .then(result => {
       console.log(result);
@@ -135,7 +135,7 @@ export default class Consulter_les_revenus extends Component {
     const {isLoading} = this.state;
     
     //cas commercial: un produit
-    if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie === null){
+    if(params.service_prdt!="toutprod" && params.service_prdt!="service" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie !== 'toutcat'){
     
       let tableData=[];
       state.myArray.map((item)=>
@@ -243,8 +243,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       )
     }
-    //commercial un produit d'une categorie
-    if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type === 8 && params.categorie !== null){
+    //commercial tous les produits d'une categorie
+    if(params.service_prdt === "toutprod" && params.entreprise!=='toutentr'&& params.groupe!='toutgrpe' && params.categorie !== "categorie"  &&  params.categorie !== "toutcat"  && params.user_type === 8){
     
       let tableData=[];
       state.myArray.map((item)=>
@@ -308,11 +308,6 @@ export default class Consulter_les_revenus extends Component {
               style={styles.optionsButtone}> 
               EXPORTER
             </Button> 
-             {/* <Button center color="default"
-              onPress={() => this.exporter()}
-              style={styles.optionsButtone}> 
-              EXPORTER
-            </Button> */}
           </Block>
         <View style={styles.container}>
           <ScrollView horizontal={true}>
@@ -321,7 +316,7 @@ export default class Consulter_les_revenus extends Component {
                   <Text  h1
                     style={styles.caption}
                   >
-                    Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entrprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
                   </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -352,8 +347,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       )
     }
-    //commercial:toutes ses ventes
-    else if(params.service_prdt === "toutprod" && params.categorie === null && params.user_type === 8)
+    //commercial:tous les produits pour ceux qui n'ont pas de categorie
+    else if(params.service_prdt === "toutprod" && params.entreprise!=='toutentr'&& params.groupe!='toutgrpe'&& params.categorie === "categorie"   && params.user_type === 8)
     {
 
       let tableData=[], test=0;
@@ -459,7 +454,7 @@ export default class Consulter_les_revenus extends Component {
      
     }
     //cas commercial, par categorie
-    else if(params.service_prdt === "toutprod" && params.categorie !== null && params.cuvee === null && params.user_type === 8)
+    /* else if(params.service_prdt === "toutprod" && params.categorie !== null && params.cuvee === null && params.user_type === 8)
     {
 
       let tableData=[], test=0;
@@ -563,9 +558,9 @@ export default class Consulter_les_revenus extends Component {
         </View>
       )
      
-    }
+    } */
     //cas commercial par cuvee
-    else if(params.service_prdt=="toutprod" && params.cuvee!=null && params.user_type==8)
+    else if(params.service_prdt !== "toutprod" && $entreprise!=='toutentr'&& params.groupe!='toutgrpe' && params.cuvee!=null && params.categorie!='categorie' && params.categorie!='toutcat' && params.user_type==8)
     {
 
       let tableData=[], test=0;
@@ -638,7 +633,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entreprise} cuvee {params.cuvee} du {params.startDate} au {params.endDate}
                 </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -671,7 +666,7 @@ export default class Consulter_les_revenus extends Component {
      
     }
     //cas commercial...toutes les entreprises
-    else if(params.entreprise=="toutentr" && params.user_type==8)
+    else if(params.entreprise === "toutentr" && params.user_type==8)
     {
 
       let tableData=[], test=0;
@@ -778,7 +773,7 @@ export default class Consulter_les_revenus extends Component {
     }
 
     //cas commercial...tous les groupes
-    else if(params.groupe=="toutgrpe" && params.user_type==8)
+    else if(params.groupe === "toutgrpe" && params.user_type==8)
     {
 
       let tableData=[], test=0;
@@ -885,7 +880,7 @@ export default class Consulter_les_revenus extends Component {
      
     }
     //cas directeur...un produit
-    else if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==2 && params.categorie==null){
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type==2 && params.categorie !== "toutcat"){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete"?
@@ -961,7 +956,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entreprise} {params.service_prdt} du {params.startDate} au {params.endDate}
                 </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -992,8 +987,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    //cas directeur un produit d'une categorie
-    else if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==2 && params.categorie!=null){
+    //cas directeur tous les produits d'une categorie
+    else if(params.service_prdt === "toutprod" && params.entreprise !=='toutentr' && params.groupe!='toutgrpe' && params.categorie !== "categorie"  &&  params.categorie !== "toutcat"  && params.user_type === 2){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete" && item.categorie==params.categorie?
@@ -1100,8 +1095,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    //cas directeur tous les produits d'une entreprise
-    else if(params.service_prdt=="toutprod" && params.user_type==2 && params.categorie==null){
+    //directeur:tous les produits pour ceux qui n'ont pas de categorie
+    else if(params.service_prdt === "toutprod" && params.entreprise!=='toutentr'&& params.groupe!='toutgrpe'&& params.categorie === "categorie"   && params.user_type === 2) {
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete"?
@@ -1209,7 +1204,7 @@ export default class Consulter_les_revenus extends Component {
       )
     }
     //cas directeur par categorie
-    else if(params.service_prdt=="toutprod" && params.user_type==2 && params.cuvee==null && params.categorie!=null){
+    /* else if(params.service_prdt=="toutprod" && params.user_type==2 && params.cuvee==null && params.categorie!=null){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete" && item.categorie==params.categorie?
@@ -1315,9 +1310,9 @@ export default class Consulter_les_revenus extends Component {
         </View>
         </View>
       )
-    }
+    } */
     //cas directeur par cuvee
-    else if(params.service_prdt=="toutprod" && params.user_type==2 && params.cuvee!=null){
+    else if(params.service_prdt !== "toutprod" && $entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type === 2) {
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete" && item.cuvee==params.cuvee?
@@ -1425,7 +1420,7 @@ export default class Consulter_les_revenus extends Component {
       )
     }
     //cas directeur toutes les entreprises
-    else if(params.entreprise=="toutentr" && params.user_type==2){
+    else if(params.entreprise === "toutentr" && params.user_type === 2){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete"?
@@ -1532,7 +1527,7 @@ export default class Consulter_les_revenus extends Component {
       )
     }
     //cas directeur Holding
-    else if(params.groupe=="toutgrpe" && params.user_type==2){
+    else if(params.groupe === "toutgrpe" && params.user_type === 2){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete"?
@@ -1640,7 +1635,7 @@ export default class Consulter_les_revenus extends Component {
 
     }
     //cas responsable de vente...un produit
-    else if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type>2 && params.user_type<8 && params.categorie==null){
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type>2 && params.user_type<8 && params.categorie !== "toutcat"){
       
       let tableData=[], test=0;
       state.myArray.map((item)=>
@@ -1746,8 +1741,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    //car responsable de vente un produit d'une categorie
-    else if(params.service_prdt!="toutprod" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type>2 && params.user_type<8 && params.categorie!=null){
+    //cas responsable tous les produits d'une categorie
+    else if(params.service_prdt === "toutprod" && params.entreprise !=='toutentr' && params.groupe!='toutgrpe' && params.categorie !== "categorie"  &&  params.categorie !== "toutcat" && params.user_type > 2 && params.user_type < 8) {
       
       let tableData=[], test=0;
       state.myArray.map((item)=>
@@ -1822,7 +1817,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entreprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
                 </Text>
               </Block> 
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -1853,8 +1848,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    //cas responsable de vente...tous les produits
-    else if(params.service_prdt=="toutprod" && params.user_type>2 && params.user_type<8 && item.categorie==null)
+    //responsable:tous les produits pour ceux qui n'ont pas de categorie
+    else if(params.service_prdt === "toutprod" && params.entreprise!=='toutentr'&& params.groupe!='toutgrpe'&& params.categorie === "categorie" && params.user_type>2 && params.user_type<8) 
     {
      
       let tableData=[], test=0;
@@ -1930,7 +1925,7 @@ export default class Consulter_les_revenus extends Component {
                   <Text  h1
                     style={styles.caption}
                   >
-                      Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
                   </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -1961,7 +1956,7 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    //cas responsable par categorie
+    /* //cas responsable par categorie
     else if(params.service_prdt=="toutprod" && params.user_type>2 && params.user_type<8 && item.categorie!=null && item.cuvee==null)
     {
      
@@ -2068,9 +2063,9 @@ export default class Consulter_les_revenus extends Component {
           </View>
         </View>
       );
-    }
+    } */
     //cas responsable par cuvee
-    else if(params.service_prdt=="toutprod" && params.user_type>2 && params.user_type<8 && item.cuvee!=null)
+    else if(params.service_prdt !== "toutprod" && $entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type > 2 && params.user_type < 8)
     {
      
       let tableData=[], test=0;
@@ -2178,7 +2173,7 @@ export default class Consulter_les_revenus extends Component {
       );
     }
     //cas responsable de vente...toutes les entreprises
-    else if(params.entreprise=="toutentr" && params.user_type>2 && params.user_type<8)
+    else if(params.entreprise === "toutentr" && params.user_type > 2 && params.user_type < 8)
     {
       let tableData=[], test=0;
       state.myArray.map((item)=>
@@ -2286,7 +2281,7 @@ export default class Consulter_les_revenus extends Component {
     }
 
     //cas responsable de vente...tous les groupes
-    else if(params.groupe=="toutgrpe" && params.user_type>2 && params.user_type<8)
+    else if(params.groupe === "toutgrpe" && params.user_type > 2 && params.user_type < 8)
     {
 
       let tableData=[], test=0;

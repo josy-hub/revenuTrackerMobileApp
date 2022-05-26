@@ -512,18 +512,18 @@
               <Block space="between" style={styles.choix_card}>
                 <Text>Choisir un groupe</Text>
                 <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
-                    <RNPickerSelect 
-                      style={{
-                        //placeholder: {color: "black"},
-                        inputIOS: { color: "black" },
-                        inputAndroid: { color: "black" },
-                      }}
-                      placeholder={placeholder1}
-                      placeholderTextColor="black"
-                      value={typeof backparams!=='undefined'&& this.state.choixgrpe==null? backparams.choixgrpe: this.state.choixgrpe}
-                      onValueChange={(value) => this.choixentreprise(value)}
-                      items={this.state.groupes}
-                    />   
+                  <RNPickerSelect 
+                    style={{
+                      //placeholder: {color: "black"},
+                      inputIOS: { color: "black" },
+                      inputAndroid: { color: "black" },
+                    }}
+                    placeholder={placeholder1}
+                    placeholderTextColor="black"
+                    value={typeof backparams!=='undefined'&& this.state.choixgrpe==null? backparams.choixgrpe: this.state.choixgrpe}
+                    onValueChange={(value) => this.choixentreprise(value)}
+                    items={this.state.groupes}
+                  />   
                 </Block>
                 <Text style={{marginTop:20}}>Choisir une entreprise</Text>
                 <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>

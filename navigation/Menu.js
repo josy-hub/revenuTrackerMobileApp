@@ -20,7 +20,7 @@ function CustomDrawerContent({ drawerPosition, navigation, profile, focused, sta
     "A propos",
     "Connexion",        
   ];
-  console.log(state.routeNames)
+  
   return (
     <Block
       style={styles.container}

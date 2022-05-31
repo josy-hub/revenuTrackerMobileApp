@@ -14,7 +14,7 @@ export default class Consulter_les_revenus extends Component {
     this.state = {
       myArray: [],
       header: [],
-      widthArr,
+      widthArr: [],
       url:'',
       isLoading:true
     }
@@ -46,7 +46,7 @@ export default class Consulter_les_revenus extends Component {
     .then(result => {
       var rslt = JSON.parse(result);
       console.log("rslttttt", rslt);
-      if(rslt['status']=='ok' && rslt['data'].length>0) {
+      if(rslt['status'] === 'ok' && rslt['data'].length>0) {
         let myArray = rslt['data'];
         let header = rslt['header'];
         let widthArr=[];
@@ -106,7 +106,7 @@ export default class Consulter_les_revenus extends Component {
     .then(result => {
       console.log(result);
       var rslt = JSON.parse(result);
-      if(rslt['status']=='ok' && rslt['url'].length>0){
+      if(rslt['status']==='ok' && rslt['url'].length>0){
         let url = rslt['url'];
         //this.setState({url});
         Linking.openURL(url);
@@ -129,13 +129,14 @@ export default class Consulter_les_revenus extends Component {
     const { params } = route.params;
     let tableHead = state.header;
     let widthArr = state.widthArr;
+    console.log('paramssss', params)
     //let tableHead= ['Date','Reference de la vente','Statut de la vente','Groupe','Entreprise','categorie','produit', 'cuvee/batch','unite de mesure','fournisseur/type fournisseur','Prix de reference','prix de vente','remise','variation', 'quantite', 'total vente','Total M-1','Total N-1','YTD','LYTD','YTD var','commercial','commentaire commercial', 'remarques du responsable','nom du client', 'telephone du client', 'Email du client', 'Localiation du client'];
     //let widthArr=[100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100];
     
-    const {isLoading} = this.state;
+    const { isLoading } = this.state;
     
     //cas commercial: un produit
-    if(params.service_prdt!="toutprod" && params.service_prdt!="service" && params.entreprise!="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie !== 'toutcat'){
+    if(params.service_prdt!=="toutprod" && params.service_prdt!=="service" && params.entreprise!=="toutentr" && params.groupe!="toutgrpe" && params.user_type==8 && params.categorie !== 'toutcat' && params.cuvee === null){
     
       let tableData=[];
       state.myArray.map((item)=>
@@ -145,20 +146,22 @@ export default class Consulter_les_revenus extends Component {
         item.reference,
         item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
           params:{
-          "choixentreprise":params.entreprise,
-          "choixproduit":params.service_prdt,
-          "choixref":item.reference, 
-          "type":"modif",
-          "modif":"ref",
-          "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
-          "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
+          "choixentreprise": params.entreprise,
+          "choixproduit": params.service_prdt,
+          "choixref": item.reference, 
+          "type": "modif",
+          "modif": "ref",
+          "reprise": "oui",
+          "date": item.date_vente,
+          "type_user": params.user_type,
+          "raison_responsable": item.raison_responsable,
+          "remise": item.remise,
+          "mode_de_paiement": item.mode_de_paiement,
+          "poste": params.poste,
+          "cuvee": item.cuvee,
+          "categorie": item.categorie,
+          "fournisseur": item.fournisseur,
+          "prix_de_reference": item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
         item.groupe,
@@ -171,6 +174,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -254,20 +259,22 @@ export default class Consulter_les_revenus extends Component {
         item.reference,
         item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
           params:{
-          "choixentreprise":params.entreprise,
-          "choixproduit":params.service_prdt,
-          "choixref":item.reference, 
+          "choixentreprise": params.entreprise,
+          "choixproduit": params.service_prdt,
+          "choixref": item.reference, 
           "type":"modif",
           "modif":"ref",
           "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
-          "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
+          "date": item.date_vente,
+          "type_user": params.user_type,
+          "raison_responsable": item.raison_responsable,
+          "remise": item.remise,
+          "mode_de_paiement": item.mode_de_paiement,
+          "cuvee": item.cuvee,
+          "categorie": item.categorie,
+          "fournisseur": item.fournisseur,
+          "poste": params.poste,
+          "prix_de_reference": item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
         item.groupe,
@@ -280,6 +287,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -316,7 +325,7 @@ export default class Consulter_les_revenus extends Component {
                   <Text  h1
                     style={styles.caption}
                   >
-                    Details des ventes de: {params.entrprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
+                    Details des ventes de: {params.entreprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
                   </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -357,22 +366,24 @@ export default class Consulter_les_revenus extends Component {
         tableData.push([
         item.date_vente,
         item.reference,
-        item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
+        item.etat === "a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
           params:{
-          "choixentreprise":item.raison_social,
-          "choixproduit":item.nom,
-          "choixref":item.reference, 
-          "type":"modif",
-          "modif":"ref",
-          "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
+          "choixentreprise": item.raison_social,
+          "choixproduit": item.nom,
+          "choixref": item.reference, 
+          "type": "modif",
+          "modif": "ref",
+          "reprise": "oui",
+          "date": item.date_vente,
+          "type_user": params.user_type,
+          "raison_responsable": item.raison_responsable,
           "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
+          "mode_de_paiement": item.mode_de_paiement,
+          "cuvee": item.cuvee,
+          "categorie": item.categorie,
+          "fournisseur": item.fournisseur,
+          "poste": params.poste,
+          "prix_de_reference": item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
         item.groupe,
@@ -385,6 +396,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -453,114 +466,8 @@ export default class Consulter_les_revenus extends Component {
       )
      
     }
-    //cas commercial, par categorie
-    /* else if(params.service_prdt === "toutprod" && params.categorie !== null && params.cuvee === null && params.user_type === 8)
-    {
-
-      let tableData=[], test=0;
-      state.myArray.map((item)=>
-        item.etat!="rejete" && item.categorie==params.categorie?
-        tableData.push([
-        item.date_vente,
-        item.reference,
-        item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
-          params:{
-          "choixentreprise":item.raison_social,
-          "choixproduit":item.nom,
-          "choixref":item.reference, 
-          "type":"modif",
-          "modif":"ref",
-          "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
-          "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
-        }})}>{item.etat}</Button> : 
-        item.etat,
-        item.groupe,
-        item.raison_social,
-        item.categorie,
-        item.nom,
-        item.cuvee,
-        item.unite,
-        item.fournisseur,
-        item.prix_de_reference,
-        this.formatMillier(item.prix_de_vente),
-        item.remise,
-        item.variation,
-        item.quantite,
-        item.total,
-        item.lastmonth,
-        item.lastyear,
-        item.ytd,
-        item.lytd,
-        item.varYTD,
-        item.nom_user,
-        item.commentaire_commercial,
-        item.raison_responsable,
-        item.nom_client,
-        item.contact,
-        item.email,
-        item.localisation
-      ])
-      :test=0
-      );
-      console.log(tableData);
-      console.log("test============"+tableHead+"test2++++++++++:"+tableData);
-      return (
-        <View style={styles.globale_container}>
-          <Block  right>
-            <Button center color="default"
-              onPress={() => Linking.openURL(state.url)}
-              style={styles.optionsButtone}> 
-              EXPORTER
-            </Button>
-          </Block>
-        <View style={styles.container}>
-          <ScrollView horizontal={true}>
-            <View>
-              <Block>
-                <Text  h1
-                  style={styles.caption}
-                >
-                  Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
-                </Text>
-                </Block> 
-                <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  <Row data={tableHead} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
-                </Table>
-                <ScrollView style={styles.dataWrapper}>
-                  <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                    {tableData.map((rowData,index)=>  
-                      <Row
-                        data={rowData}
-                        key={index}
-                        widthArr={widthArr}
-                        style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
-                        textStyle={styles.text}
-                      />
-                    )}
-                  </Table>
-                  <ActivityIndicator
-                    color="#00ff00"
-                    size="large"
-                    style = {styles.activityIndicator}
-                    animating ={isLoading}
-                  />   
-                </ScrollView>    
-            </View>
-          </ScrollView>
-        </View>
-        </View>
-      )
-     
-    } */
     //cas commercial par cuvee
-    else if(params.service_prdt !== "toutprod" && $entreprise!=='toutentr'&& params.groupe!='toutgrpe' && params.cuvee!=null && params.categorie!='categorie' && params.categorie!='toutcat' && params.user_type==8)
+    else if(params.service_prdt !== "toutprod" && params.entreprise!=='toutentr'&& params.groupe!='toutgrpe' && params.cuvee!==null && params.categorie!='categorie' && params.categorie!='toutcat' && params.user_type==8)
     {
 
       let tableData=[], test=0;
@@ -571,20 +478,22 @@ export default class Consulter_les_revenus extends Component {
         item.reference,
         item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
           params:{
-          "choixentreprise":item.raison_social,
-          "choixproduit":item.nom,
-          "choixref":item.reference, 
-          "type":"modif",
-          "modif":"ref",
-          "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
-          "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
+          "choixentreprise": item.raison_social,
+          "choixproduit": item.nom,
+          "choixref": item.reference, 
+          "type": "modif",
+          "modif": "ref",
+          "reprise": "oui",
+          "date": item.date_vente,
+          "type_user": params.user_type,
+          "raison_responsable": item.raison_responsable,
+          "remise": item.remise,
+          "mode_de_paiement": item.mode_de_paiement,
+          "cuvee": item.cuvee,
+          "categorie": item.categorie,
+          "fournisseur": item.fournisseur,
+          "poste": params.poste,
+          "prix_de_reference": item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
         item.groupe,
@@ -597,6 +506,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -687,9 +598,11 @@ export default class Consulter_les_revenus extends Component {
           "type_user":params.user_type,
           "raison_responsable":item.raison_responsable,
           "remise":item.remise,
+          "mode_de_paiement": item.mode_de_paiement,
           "cuvee":item.cuvee,
           "categorie":item.categorie,
           "fournisseur":item.fournisseur,
+          "poste": params.poste,
           "prix_de_reference":item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
@@ -703,6 +616,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -771,7 +686,6 @@ export default class Consulter_les_revenus extends Component {
       )
      
     }
-
     //cas commercial...tous les groupes
     else if(params.groupe === "toutgrpe" && params.user_type==8)
     {
@@ -784,20 +698,22 @@ export default class Consulter_les_revenus extends Component {
         item.reference,
         item.etat=="a modifier" ? <Button  style={styles.btn} onPress={() =>navigation.navigate("RenseignerService",{
           params:{
-          "choixentreprise":item.raison_social,
-          "choixproduit":item.nom,
-          "choixref":item.reference, 
-          "type":"modif",
-          "modif":"ref",
-          "reprise":"oui",
-          "date":item.date_vente,
-          "type_user":params.user_type,
-          "raison_responsable":item.raison_responsable,
-          "remise":item.remise,
-          "cuvee":item.cuvee,
-          "categorie":item.categorie,
-          "fournisseur":item.fournisseur,
-          "prix_de_reference":item.prix_de_reference
+          "choixentreprise": item.raison_social,
+          "choixproduit": item.nom,
+          "choixref": item.reference, 
+          "type": "modif",
+          "modif": "ref",
+          "reprise": "oui",
+          "date": item.date_vente,
+          "type_user": params.user_type,
+          "raison_responsable": item.raison_responsable,
+          "remise": item.remise,
+          "mode_de_paiement": item.mode_de_paiement,
+          "cuvee": item.cuvee,
+          "categorie": item.categorie,
+          "fournisseur": item.fournisseur,
+          "poste": params.poste,
+          "prix_de_reference": item.prix_de_reference
         }})}>{item.etat}</Button> : 
         item.etat,
         item.groupe,
@@ -810,6 +726,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -877,10 +795,9 @@ export default class Consulter_les_revenus extends Component {
         </View>
         </View>
       )
-     
     }
     //cas directeur...un produit
-    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type==2 && params.categorie !== "toutcat"){
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type==2 && params.categorie !== "toutcat" && params.cuvee === null){
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete"?
@@ -891,22 +808,25 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, 
-            "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
+            "prix_de_reference": item.prix_de_reference, 
+            "produit": item.nom, 
+            "date": item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
             "validation":"modifier",
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
-            "modif_id":item.modif_id}})}>{item.etat}
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
+            "cuvee": item.cuvee,
+            "categorie": item.categorie,
+            "fournisseur": item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
+            "modif_id": item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
         item.groupe,
@@ -919,6 +839,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1011,9 +933,12 @@ export default class Consulter_les_revenus extends Component {
             "reference":item.reference,
             "validation":"modifier",
             "remise":item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "modif_id":item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1027,6 +952,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1107,21 +1034,24 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, 
-            "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "validation":"modifier",
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
+            "prix_de_reference": item.prix_de_reference, 
+            "produit": item.nom, 
+            "date": item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
+            "validation": "modifier",
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
+            "cuvee": item.cuvee,
+            "categorie": item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             'modif_id':item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1135,6 +1065,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1172,7 +1104,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
+                  Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
                 </Text>
               </Block> 
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -1203,116 +1135,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       )
     }
-    //cas directeur par categorie
-    /* else if(params.service_prdt=="toutprod" && params.user_type==2 && params.cuvee==null && params.categorie!=null){
-      let tableData=[], test=0;
-      state.myArray.map((item)=>
-        item.etat!="rejete" && item.categorie==params.categorie?
-        tableData.push([
-        item.date_vente,
-        item.reference,
-        item.etat=="modifie" ? 
-        <Button center style={styles.btn} onPress={() =>
-          navigation.navigate("ValidationTracking",{
-          params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, 
-            "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "validation":"modifier",
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
-            'modif_id':item.modif_id}})}>{item.etat}
-        </Button> : 
-        item.etat,
-        item.groupe,
-        item.raison_social,
-        item.categorie,
-        item.nom,
-        item.cuvee,
-        item.unite,
-        item.fournisseur,
-        item.prix_de_reference,
-        this.formatMillier(item.prix_de_vente),
-        item.remise,
-        item.variation,
-        item.quantite,
-        item.total,
-        item.lastmonth,
-        item.lastyear,
-        item.ytd,
-        item.lytd,
-        item.varYTD,
-        item.nom_user,
-        item.commentaire_commercial,
-        item.raison_responsable,
-        item.nom_client,
-        item.contact,
-        item.email,
-        item.localisation
-      ])
-      :test=0
-      );
-      console.log(tableData);
-      console.log("test============"+tableHead+"test2++++++++++:"+tableData);
-    
-      return (
-        <View style={styles.globale_container}>
-          <Block  right>
-            <Button center color="default"
-              onPress={() => Linking.openURL(state.url)}
-              style={styles.optionsButtone}> 
-              EXPORTER
-            </Button>
-          </Block>
-        <View style={styles.container}>
-          <ScrollView horizontal={true}>
-            <View>
-              <Block>
-                <Text  h1
-                  style={styles.caption}
-                >
-                    Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
-                </Text>
-              </Block> 
-              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                <Row data={tableHead} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
-              </Table>
-              <ScrollView style={styles.dataWrapper}>
-                <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  {tableData.map((rowData,index)=>  
-                    <Row
-                      data={rowData}
-                      key={index}
-                      widthArr={widthArr}
-                      style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
-                      textStyle={styles.text}
-                    />
-                  )}
-                </Table>
-                <ActivityIndicator
-                  color="#00ff00"
-                  size="large"
-                  style = {styles.activityIndicator}
-                  animating ={isLoading}
-                /> 
-              </ScrollView>
-            </View>
-          </ScrollView>
-        </View>
-        </View>
-      )
-    } */
     //cas directeur par cuvee
-    else if(params.service_prdt !== "toutprod" && $entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type === 2) {
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type === 2) {
       let tableData=[], test=0;
       state.myArray.map((item)=>
         item.etat!="rejete" && item.cuvee==params.cuvee?
@@ -1335,9 +1159,12 @@ export default class Consulter_les_revenus extends Component {
             "reference":item.reference,
             "validation":"modifier",
             "remise":item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             'modif_id':item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1351,6 +1178,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1431,21 +1260,25 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
+            "prix_de_reference": item.prix_de_reference, 
+            "produit": item.nom,
+            "date":item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
             "validation":"modifier",
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
-            "modif_id":item.modif_id}})}>{item.etat}
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
+            "cuvee": item.cuvee,
+            "categorie": item.categorie,
+            "fournisseur": item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
+            "modif_id": item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
         item.groupe,
@@ -1458,6 +1291,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1542,16 +1377,20 @@ export default class Consulter_les_revenus extends Component {
             "quantite":item.quantite, 
             "preuve":item.preuve, 
             "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
+            "produit":item.nom,
+            "date":item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
             "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "validation":"modifier",
-            "remise":item.remise,
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
+            "validation": "modifier",
+            "remise": item.remise,
+            "mode de paiement" : item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "modif_id":item.modif_id}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1565,6 +1404,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1635,7 +1476,7 @@ export default class Consulter_les_revenus extends Component {
 
     }
     //cas responsable de vente...un produit
-    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type>2 && params.user_type<8 && params.categorie !== "toutcat"){
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== "toutentr" && params.groupe !== "toutgrpe" && params.user_type>2 && params.user_type<8 && params.categorie !== "toutcat" && params.cuvee === null){
       
       let tableData=[], test=0;
       state.myArray.map((item)=>
@@ -1657,9 +1498,12 @@ export default class Consulter_les_revenus extends Component {
             "produit_service_id":item.produit_service_id, 
             "reference":item.reference,
             "remise":item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "validation":"renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1673,6 +1517,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1710,7 +1556,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
+                  Details des ventes de: {params.service_prdt} du {params.startDate} au {params.endDate}
                 </Text>
               </Block> 
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -1754,19 +1600,23 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
             "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "remise":item.remise,
+            "produit":item.nom,
+            "date": item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
+            "categorie": item.categorie,
+            "fournisseur": item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "validation":"renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1780,6 +1630,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1817,7 +1669,7 @@ export default class Consulter_les_revenus extends Component {
                 <Text  h1
                   style={styles.caption}
                 >
-                    Details des ventes de: {params.entreprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
+                  Details des ventes de: {params.entreprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
                 </Text>
               </Block> 
               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -1862,19 +1714,23 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
+            "prix_de_reference": item.prix_de_reference, 
+            "produit": item.nom,
+            "date": item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
             "reference":item.reference,
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
+            "cuvee": item.cuvee,
+            "categorie": item.categorie,
+            "fournisseur": item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "validation":"renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -1888,6 +1744,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -1956,116 +1814,8 @@ export default class Consulter_les_revenus extends Component {
         </View>
       );
     }
-    /* //cas responsable par categorie
-    else if(params.service_prdt=="toutprod" && params.user_type>2 && params.user_type<8 && item.categorie!=null && item.cuvee==null)
-    {
-     
-      let tableData=[], test=0;
-      state.myArray.map((item)=>
-        item.etat!="rejete" && item.categorie==params.categorie?
-        tableData.push([
-        item.date_vente,
-        item.reference,
-        item.etat=="en attente" ? 
-        <Button center style={styles.btn} onPress={() =>
-          navigation.navigate("ValidationTracking",{
-          params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "remise":item.remise,
-            "cuvee":item.cuvee,
-            "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
-            "validation":"renseigner"}})}>{item.etat}
-        </Button> : 
-        item.etat,
-        item.groupe,
-        item.raison_social,
-        item.categorie,
-        item.nom,
-        item.cuvee,
-        item.unite,
-        item.fournisseur,
-        item.prix_de_reference,
-        this.formatMillier(item.prix_de_vente),
-        item.remise,
-        item.variation,
-        item.quantite,
-        item.total,
-        item.lastmonth,
-        item.lastyear,
-        item.ytd,
-        item.lytd,
-        item.varYTD,
-        item.nom_user,
-        item.commentaire_commercial,
-        item.raison_responsable,
-        item.nom_client,
-        item.contact,
-        item.email,
-        item.localisation
-      ])
-      :test=0
-      );
-      console.log(tableData);
-      console.log("test============"+tableHead+"test2++++++++++:"+tableData);
-    
-      return (
-        <View style={styles.globale_container}>
-          <Block  right>
-            <Button center color="default"
-              onPress={() => Linking.openURL(state.url)}
-              style={styles.optionsButtone}> 
-              EXPORTER
-            </Button>
-          </Block>
-          <View style={styles.container}>
-            <ScrollView horizontal={true}>
-              <View>
-                <Block>
-                  <Text  h1
-                    style={styles.caption}
-                  >
-                      Details des ventes de: {params.entreprise} du {params.startDate} au {params.endDate}
-                  </Text>
-                </Block> 
-                <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                  <Row data={tableHead} style={styles.header}  widthArr={widthArr} textStyle={styles.titleText}/>
-                </Table>
-                <ScrollView style={styles.dataWrapper}>
-                  <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                    {tableData.map((rowData,index)=>  
-                      <Row
-                        data={rowData}
-                        key={index}
-                        widthArr={widthArr}
-                        style={[styles.row,index%2 && {backgroundColor: '#F7F6E7'}]}
-                        textStyle={styles.text}
-                      />
-                    )}
-                  </Table>
-                  <ActivityIndicator
-                    color="#00ff00"
-                    size="large"
-                    style = {styles.activityIndicator}
-                    animating ={isLoading}
-                  /> 
-                </ScrollView>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      );
-    } */
     //cas responsable par cuvee
-    else if(params.service_prdt !== "toutprod" && $entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type > 2 && params.user_type < 8)
+    else if(params.service_prdt !== "toutprod" && params.entreprise !== 'toutentr'&& params.groupe !== 'toutgrpe' && params.cuvee !== null && params.categorie !== 'categorie' && params.categorie !== 'toutcat' && params.user_type > 2 && params.user_type < 8)
     {
      
       let tableData=[], test=0;
@@ -2078,20 +1828,24 @@ export default class Consulter_les_revenus extends Component {
         <Button center style={styles.btn} onPress={() =>
           navigation.navigate("ValidationTracking",{
           params:{
-            "prix_unitaire":item.prix_de_vente, 
-            "quantite":item.quantite, 
-            "preuve":item.preuve, 
-            "prix_de_reference":item.prix_de_reference, 
-            "produit":item.nom, "date":item.date_vente, 
-            "commentaire_commercial":item.commentaire_commercial, 
-            "user_id":item.user_id, 
-            "produit_service_id":item.produit_service_id, 
-            "reference":item.reference,
-            "remise":item.remise,
-            "cuvee":item.cuvee,
+            "prix_unitaire": item.prix_de_vente, 
+            "quantite": item.quantite, 
+            "preuve": item.preuve, 
+            "prix_de_reference": item.prix_de_reference, 
+            "produit": item.nom,
+            "date":item.date_vente, 
+            "commentaire_commercial": item.commentaire_commercial, 
+            "user_id": item.user_id, 
+            "produit_service_id": item.produit_service_id, 
+            "reference": item.reference,
+            "remise": item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
+            "cuvee": item.cuvee,
             "categorie":item.categorie,
-            "fournisseur":item.fournisseur,
-            "validation":"renseigner"}})}>{item.etat}
+            "fournisseur": item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
+            "validation": "renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
         item.groupe,
@@ -2104,6 +1858,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -2195,9 +1951,12 @@ export default class Consulter_les_revenus extends Component {
             "produit_service_id":item.produit_service_id, 
             "reference":item.reference,
             "remise":item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "validation":"renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -2211,6 +1970,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -2304,9 +2065,12 @@ export default class Consulter_les_revenus extends Component {
             "produit_service_id":item.produit_service_id, 
             "reference":item.reference,
             "remise":item.remise,
+            "mode_de_paiement": item.mode_de_paiement,
             "cuvee":item.cuvee,
             "categorie":item.categorie,
             "fournisseur":item.fournisseur,
+            "poste": params.poste,
+            "vente_id": item.vente_id,
             "validation":"renseigner"}})}>{item.etat}
         </Button> : 
         item.etat,
@@ -2320,6 +2084,8 @@ export default class Consulter_les_revenus extends Component {
         item.prix_de_reference,
         this.formatMillier(item.prix_de_vente),
         item.remise,
+        item.mode_de_paiement === 1 ? 'comptant': 'a credit' ,
+        item.type_entree === 1 ? 'revenu': 'autre entree',
         item.variation,
         item.quantite,
         item.total,
@@ -2393,7 +2159,7 @@ export default class Consulter_les_revenus extends Component {
  
 const styles = StyleSheet.create({
   globale_container:{
-       flex:1,
+    flex:1,
   },
   container: { 
     flex: 1, 
@@ -2458,7 +2224,8 @@ const styles = StyleSheet.create({
   },
   optionsButtone: {
     width: "auto",
-    height: 30,
+    //height: 30,
+    height: 'auto',
     paddingHorizontal: theme.SIZES.BASE,
     paddingVertical: 10,
     backgroundColor:"orange",

@@ -11,7 +11,7 @@ import {
 import Storage from 'react-native-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Block , Text,theme} from "galio-framework";
-import { Button, Modal, Center, Spinner} from "native-base";
+import { Button, Modal, Center, Spinner, Heading,} from "native-base";
 
 
 import * as ImagePicker from 'expo-image-picker';
@@ -71,9 +71,10 @@ class Renseigner_service extends React.Component{
           entreprise_email:'',
           entreprise_contact:'',
           entreprisesiege_social:'',
-          isLoading:false,
+          loading:false,
           mode_de_paie: null,
           showModal: false,
+          showModal2: false,
         };
         const { route } = this.props;
         this.params=route.params;
@@ -180,8 +181,6 @@ class Renseigner_service extends React.Component{
         }
     }
 
-    closeActivityIndicator = () => setTimeout(() => this.setState({
-        isLoading: false }), 60000)
     async suivant(){
         const{route, navigation}=this.props;
         const {params}  = route.params;
@@ -191,10 +190,10 @@ class Renseigner_service extends React.Component{
         const URL1 =racine + 'ventes/';
         const URL = racine + 'photo';
         let A, prix_unitairefssr=0, prix_unitaireconso=0, entreprisefssr, collectionfssr, produitfssr, fssr_interne='non'; 
-        this.setState({ isLoading: true })
 
         if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 && this.state.commentaire!=null && this.state.image!=null && this.state.mode_de_paie!=null){
-
+            this.setState({ showModal2: true })
+            this.setState({ showModal: false })
            //enregistrement du justif
             var data = new FormData();
             data.append('preuve', {
@@ -248,7 +247,10 @@ class Renseigner_service extends React.Component{
                     var rslt = JSON.parse(result);
                     this.setState({ventefssr_id:rslt['ventes'].id});
                 })
-                .catch(error => console.log(error));
+                .catch(error =>{
+                    console.log(error)
+                    this.setState({ showModal2: false })
+                });
             }
             else if(params.choixtypefssr=='externe'){
                 entreprisefssr=params.fssrExt;
@@ -297,10 +299,14 @@ class Renseigner_service extends React.Component{
         
                 }})
             })
-            .catch(error => Alert.alert("erreur sur le serveur: vos donnees n'ont pas pu etre enregistrees"));     
+            .catch(error =>{ 
+                Alert.alert("erreur sur le serveur: vos donnees n'ont pas pu etre enregistrees")
+                this.setState({ showModal2: false })
+            });     
         }
         else if(validation=="oui" &&   typeof backparams!=='undefined' /* && backparams.prix_unitaire>0 && backparams.qtite>0 && backparams.commentaire!=null && backparams.image!=null && backparams.choixprdt!=null && backparams.newDate!=null */){
-            
+            this.setState({ showModal2: true })
+            this.setState({ showModal: false })
             //enregistrement du justif
             var data = new FormData();
             data.append('image', {
@@ -354,7 +360,10 @@ class Renseigner_service extends React.Component{
                     var rslt = JSON.parse(result);
                     this.setState({ventefssr_id:rslt['ventes'].id});
                 })
-                .catch(error => console.log(error));
+                .catch(error =>{
+                    console.log(error)
+                    this.setState({ showModal2: false })
+                });
 
             }
             else if(backparams.choixtypefssr=='externe'){
@@ -405,7 +414,10 @@ class Renseigner_service extends React.Component{
         
                 }})
             })
-            .catch(error => Alert.alert("erreur sur le serveur: vos donnees n'ont pas pu etre enregistrees"));     
+            .catch(error =>{
+                Alert.alert("erreur sur le serveur: vos donnees n'ont pas pu etre enregistrees")
+                this.setState({ showModal2: false })
+            });     
         }
         else if(validation=='non' && parseInt(this.state.prix_unitaire)>=0 && parseInt(this.state.qtite)>0 && this.state.commentaire!=null && this.state.image!=null && this.state.mode_de_paie!=null) {
             alert("vous ne pouvez pas vendre"+' '+ params.choixentreprise+' '+"a ce prix");
@@ -427,10 +439,9 @@ class Renseigner_service extends React.Component{
 
     async sauvegarder() {
         const{route, navigation}=this.props;
-        const {params}  = route.params;
         const {backparams}  = route.params;
         const URL1 = racine + 'sauvegardephoto'
-        if(validation=="oui" && this.state.prix_unitaire>0 && this.state.qtite>0 || validation=="oui" && typeof backparams!=undefined && backparams.prix_unitaire>0 && backparams.state.qtite>0){
+        if(validation === "oui" && this.state.prix_unitaire>0 && this.state.qtite>0 || validation=="oui" && typeof backparams!=undefined) { //&& backparams.prix_unitaire>0 && backparams.state.qtite>0
             /* if(this.state.image!=null || backparams.image!=null){
                 //sauvegarde du justif
                 var donnee = new FormData();
@@ -481,6 +492,7 @@ class Renseigner_service extends React.Component{
                 remise:this.state.remise,
                 type_de_vente:this.params.params.type_de_vente,
                 groupe_de_vente_id:this.params.params.groupe_de_vente_id,
+                mode_de_paiement: this.state.mode_de_paie === null? 1 : this.state.mode_de_paie,
             }
             var myHeaders = new Headers();
             myHeaders.append("Accept", "application/json");
@@ -508,7 +520,8 @@ class Renseigner_service extends React.Component{
                     qtite:0,
                     commentaire:null,
                     image: null,
-                    remise:0
+                    remise:0,
+                    mode_de_paie: null
                 })
             })
             .catch((error) => {
@@ -523,30 +536,7 @@ class Renseigner_service extends React.Component{
     sauvegardes(){
         this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:"renseignerservice"}})
     }
-    /*
-    getsauvegarde=async()=>{
-        try{
-           const elements = await AsyncStorage.getItem('elements');
-           const value=JSON.parse(elements);
-           console.log(value)
-           if(value !==null){
-            this.setState({
-                prix_unitaire:value.prix_unitaire, 
-                qtite:value.qtite, 
-                image:value.image,
-                commentaire:value.commentaire,
-                produit_id:value.produit_id,
-                prix_tot:value.prix_tot,
-                prix_ref:value.prix_ref,
-                prix_tot_ref:value.prix_tot_ref,
-                variation:value.variation
-
-            });
-           }
-        } catch(e){
-            Alert.alert("Erreur: les donnees sauvegardees n'ont pas pu etre recuperees");
-        }
-    }*/
+    
     async envoyerModifier(){
         let nvetat;
         this.params.params.reprise=="non"?
@@ -568,41 +558,30 @@ class Renseigner_service extends React.Component{
             ref=this.state.old_reference;   
         }
 
-        //const URL = 'http://tracking.socecepme.com/api/modifs_ventes';
-        //const URL1 = 'http:tracking.socecepme.com/api/modifphoto';
-        const URL = racine + 'modifs_ventes';
+        const URL = racine + 'modifier_fin';
         const URL1 = racine + 'sauvegardephoto';
         
         if(validation=="oui" && parseInt(this.state.prix_unitaire)>0 && parseInt(this.state.qtite)>0 && this.state.raison_modif!="none"  && this.state.newDate!="aucune nouvelle date choisie" && this.state.image!=null){
             
             //sauvegarde du justif
-            var donnee = new FormData();
-            donnee.append('image', {
+            var data = new FormData();
+            data.append('image', {
                 uri: this.state.image, // your file path string
                 name: '00206919-661e-469a-a19d-a8ba5587f5dc.jpg',
                 type: 'image/jpg'
             })
-    
-            await fetch(URL1, {
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data'
-                },
-                method: 'POST',
-                body: donnee
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-                var rslt = JSON.parse(result);
-                console.log(rslt['url']);
-                if(rslt['status']=='ok'){
-                    let url = rslt['url'];
-                    this.setState({url});
-                }
-            });
+            data.append('quantite', this.state.qtite)
+            data.append('etat', nvetat)
+            data.append('prix_de_vente', this.state.prix_unitaire)
+            data.append('commentaire_commercial', this.state.raison_modif)
+            data.append('raison_responsable', 'RAS')
+            data.append('user_id', this.state.seller_id)
+            data.append('date_vente', this.state.newDate)
+            data.append('remise', this.state.remise)
+            data.append('mode_de_paiement', this.state.mode_de_paie==null && backparams.mode_de_paie!=null? backparams.mode_de_paie:this.state.mode_de_paie)
+            data.append('groupe_de_vente_id', this.params.params.groupe_de_vente_id)
             
-            let collection={
+            /* let collection={
             
                 nvetat:nvetat,
                 nvprix:this.state.prix_unitaire,
@@ -616,20 +595,19 @@ class Renseigner_service extends React.Component{
                 nvremise:this.state.remise,
                 nvtype_de_vente:this.params.params.type_vente,
                 nvgroupe_de_vente_id:this.params.params.groupe_de_vente_id
-            }
+            } */
     
-            var myHeaders = new Headers();
-            myHeaders.append("Accept", "application/json");
-            myHeaders.append("Content-Type", "application/json");
-            var raw = JSON.stringify(collection);
+            var myHeaders = {
+                'Accept': 'application/json',
+                'Content-Type': 'multipart/form-data'
+            };
             var requestOptions = {
                 method: 'POST',
                 headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
-            };
+                body: data,
+            }; 
 
-            fetch(URL+'/'+this.params.params.type_user+'/'+ref+'/'+this.params.params.choixentreprise, requestOptions)
+            fetch(URL + '/' + this.state.vente_id + '/' + this.params.params.user_id + '/' + this.params.params.type_user , requestOptions)
             .then(response => response.text())
             .then(result => {
                 console.log(result);
@@ -659,7 +637,7 @@ class Renseigner_service extends React.Component{
         let convertedDate=moment(newDate).format("YYYY-MM-DD")
         this.setState({newDate:convertedDate});     
     }
-    render(){
+    render() {
         let { image } = this.state;
         let { prix_unitaire }=this.state;
         let { qtite }=this.state;
@@ -668,7 +646,7 @@ class Renseigner_service extends React.Component{
         console.log(params);
         console.log(qtite);
         const { backparams }  = route.params;
-        const { isLoading } = this.state;
+        const { loading } = this.state;
         
         //renseigner les revenus
         if(this.params.params.type=="renseigner"){
@@ -677,7 +655,7 @@ class Renseigner_service extends React.Component{
                     <ScrollView>
                         <Block card style={styles.service_card}> 
                             <Text  h5
-                                    color={argonTheme.COLORS.DEFAULT}
+                                color={argonTheme.COLORS.DEFAULT}
                             >
                                 Vente: {typeof backparams!=='undefined' && this.state.prix_tot==0 ? backparams.choixprdt : params.choixproduit} du {typeof backparams!=='undefined' && this.state.prix_tot==0 ? backparams.newDate : params.date}
                             </Text>
@@ -685,19 +663,20 @@ class Renseigner_service extends React.Component{
                         <Block style={styles.renseigner_card}>
                             <Block style={{flexDirection:"row", justifyContent:"space-between", marginTop:10}}>
                                 <Block card  style={[styles.card,{justifyContent:"flex-start"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         Prix de ref: {typeof backparams!=='undefined' && this.state.prix_tot==0? backparams.prix_ref:params.prix_ref}
                                     </Text>
                                 </Block>
                                 <Block card style={[styles.card, {justifyContent: "flex-end"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         Prix tot ref: {typeof backparams!=='undefined' && this.state.prix_tot_ref==0? backparams.prix_tot_ref: this.state.prix_tot_ref}FCFA
                                     </Text>
                                 </Block>
                             </Block>
                             {typeof backparams!=='undefined'?
                                 <Block>
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:20 }}>
+                                        <Text>Prix unitaire numerique (FCFA)</Text>
                                         <Input //type="numeric"
                                             keyboardType="numeric"
                                             right
@@ -705,19 +684,18 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff"
+                                                backgroundColor: '#fff'
                                             }}
-                                            help="Prix unitaire numerique (FCFA)"
-                                            TopHelp
                                             value={this.state.prix_unitaire==0?? backparams.prix_unitaire}
                                             onChangeText={(input) =>{this.calcul(input,"prix")}}
                                             placeholderTextColor="black"
                                             iconContent={<Block />}
                                                 
                                         />
-                                        {!this.comparer().etat?<Text style={{color:'red',display:this.comparer().prefix==""? 'none':'flex'}}> {this.comparer().prefix} {this.comparer().suffix} </Text>:<Text style={{color:"#2ECC71"}}>{this.comparer().prefix}</Text>}
+                                        {!this.comparer().etat?<Text style={{ color: 'red',display:this.comparer().prefix==""? 'none':'flex'}}> {this.comparer().prefix} {this.comparer().suffix} </Text>:<Text style={{ color: '#2ECC71' }}>{this.comparer().prefix}</Text>}
                                     </Block>
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                                        <Text>quantite numerique</Text>
                                         <Input //type="numeric"
                                             keyboardType="numeric"
                                             right
@@ -725,26 +703,19 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff"
+                                                backgroundColor: '#fff'
                                             }}
-                                            help="quantite numerique"
-                                            TopHelp
                                             value={qtite==0?? backparams.qtite}
                                             onChangeText={(input) =>this.calcul(input,"qte")}
-                                            placeholderTextColor="black"
+                                            placeholderTextColor='black'
                                             iconContent={<Block />}
                                         />
                                     </Block>
-                                    <ActivityIndicator
-                                        color="#00ff00"
-                                        size="large"
-                                        style = {styles.activityIndicator}
-                                        animating ={isLoading}
-                                    /> 
                                 </Block>
                                 :
                                 <Block>
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:30 }}>
+                                        <Text>Prix unitaire numerique (FCFA)</Text>
                                         <Input //type="numeric"
                                             keyboardType="numeric"
                                             right
@@ -752,18 +723,17 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff"
+                                                backgroundColor: '#fff'
                                             }}
-                                            help="Prix unitaire numerique (FCFA)"
-                                            TopHelp
                                             onChangeText={(input) =>{this.calcul(input,"prix")}}
-                                            placeholderTextColor="black"
+                                            placeholderTextColor='black'
                                             iconContent={<Block />}
                                                 
                                         />
                                         {!this.comparer().etat?<Text style={{color:'red',display:this.comparer().prefix==""? 'none':'flex'}}> {this.comparer().prefix} {this.comparer().suffix} </Text>:<Text style={{color:"#2ECC71"}}>{this.comparer().prefix}</Text>}
                                     </Block>
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:10 }}>
+                                        <Text>quantite numerique</Text>
                                         <Input //type="numeric"
                                             keyboardType="numeric"
                                             right
@@ -771,36 +741,33 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff"
+                                                backgroundColor: '#fff'
                                             }}
-                                            help="quantite numerique"
-                                            TopHelp
                                             onChangeText={(input) =>this.calcul(input,"qte")}
-                                            placeholderTextColor="black"
+                                            placeholderTextColor='black'
                                             iconContent={<Block />}
                                         />
                                     </Block>
                                 </Block>
 
                             }
-                            <Block  flex={1.25} middle>
+                            <Block  flex={1.25} middle style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:10 }}>
                                 {/* <TouchableOpacity onPress={this._takeImage}><Text>PHOTOGRAPHIER LE JUSTIFICATIF</Text></TouchableOpacity> */}
                                 <Button style={styles.uploadButton} onPress={this._takeImage} > PHOTOGRAPHIER LE JUSTIFICATIF DE LA VENTE </Button>
                                 <Text>OU</Text>
                                 <Button style={styles.uploadButton} onPress={this._pickImage} > CHOISIR LE JUSTIFICTIF DE LA VENTE </Button>
                                 {typeof backparams!=='undefined' && image==null ? backparams.image && <Image source={{ uri: backparams.image}} style={{ width: 200, height: 200 }} /> : image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                             </Block>
-                            <Block>
+                            <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:10 }}>
                                 <Text>mode de paiement</Text>
                                 <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
                                     <RNPickerSelect 
                                         style={{
-                                            //placeholder: {color: "black"},
-                                            inputIOS: { color: "black" },
-                                            inputAndroid: { color: "black" },
+                                            inputIOS: { color: 'black' },
+                                            inputAndroid: { color: 'black' },
                                         }}
                                         placeholder={placeholder}
-                                        placeholderTextColor="black"
+                                        placeholderTextColor='black'
                                         value={this.state.mode_de_paie}
                                         onValueChange={(value) => this.setState({mode_de_paie: value})}
                                         items={[
@@ -816,7 +783,8 @@ class Renseigner_service extends React.Component{
                                     />
                                 </Block>     
                             </Block>
-                            <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:10 }}>
+                                <Text>commentaire</Text>
                                 <Input
                                     right
                                     placeholder="commentaire (max 2 lignes)"
@@ -824,12 +792,10 @@ class Renseigner_service extends React.Component{
                                     style={{
                                         borderColor: theme.COLORS.SUCCESS,
                                         borderRadius: 4,
-                                        backgroundColor: "#fff",
+                                        backgroundColor: '#fff',
                                         //marginBottom:10
                                     }}
-                                    help="commentaire"
-                                    TopHelp
-                                    placeholderTextColor="black"
+                                    placeholderTextColor='black'
                                     value={typeof backparams!=='undefined' && this.state.commentaire==null ? backparams.commentaire: this.state.commentaire }
                                     onChangeText={(input) =>{this.setState({commentaire:input})}}
                                     iconContent={<Block />}
@@ -837,12 +803,12 @@ class Renseigner_service extends React.Component{
                             </Block>
                             <Block style={{flexDirection:"row", justifyContent:"space-between", marginTop:10}}>
                                 <Block card style={[styles.card,{justifyContent:"flex-start"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         var tot: {typeof backparams!=='undefined'  && this.state.variation==0 ? backparams.variation: this.state.variation}FCFA
                                     </Text>
                                 </Block>
                                 <Block card  style={[styles.card, {justifyContent:"flex-end"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         Prix tot: {typeof backparams!=='undefined'  && this.state.prix_tot==0 ? backparams.prix_tot:this.state.prix_tot}FCFA
                                     </Text>
                                 </Block>
@@ -866,16 +832,10 @@ class Renseigner_service extends React.Component{
                                 </Button>
                             </Block> 
                             <Block /* flex={1.25} right */style={{justifyContent:"flex-end"}}>
-                                <Button center color="default" 
+                                <Button center /* color='default' */ 
                                     style={styles.optionsButtonr} 
                                     onPress={() =>{
-                                    {/* <ActivityIndicator
-                                        color="#00ff00"
-                                        size="large"
-                                        style = {styles.activityIndicator}
-                                        animating ={isLoading}
-                                    />, */}
-                                    this.state.showModal(true)
+                                    this.setState({ showModal: true })
                                 }}
                                 >
                                     SUIVANT
@@ -889,19 +849,55 @@ class Renseigner_service extends React.Component{
                                 <Modal.Body>
                                     <Text>groupe: {params.choixgroupe}</Text>
                                     <Text>entreprise: {params.choixentreprise}</Text>
+                                    {params.categorie ? 
+                                        <Text>categorie: {params.categorie}</Text>
+                                    :   null
+                                    }
+                                    <Text>produit: {params.choixproduit}</Text>
+                                    {params.cuvee ? 
+                                        <Text>cuvee: {params.cuvee}</Text>
+                                    :   null
+                                    }
+                                    <Text>quantite: {this.state.qtite}</Text>
+                                    <Text>prix de vente: {this.state.prix_unitaire} FCFA </Text>
+                                     <Text>mode de paiement: {this.state.mode_de_paie === 1 ? 'comptant': 'a credit'}</Text>
+                                    {params.choixtypefssr === 'interne' ? 
+                                        <Text>fournisseur: {params.choixfssr}</Text>
+                                    :   params.choixtypefssr === 'externe' ?
+                                        <Text>fournisseur: {params.fsseurExt}</Text>
+                                    :   null
+                                    }
                                     <Text>date: {params.date}</Text>
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <Button.Group variant="ghost" space={2}>
-                                    <Button>REPRENDRE</Button>
-                                    <Button onPress={() => {
-                                        this.suivant()
-                                    }}>
-                                        SUIVANT
-                                        {/* <Spinner animating ={isLoading} color="emerald.500" /> */}
-                                    </Button>
+                                        <Button
+                                            onPress={() => this.setState({showModal: false})}
+                                        >
+                                            REPRENDRE
+                                        </Button>
+                                        <Button onPress={() => { this.suivant() }}>
+                                            SUIVANT
+                                        </Button>
                                     </Button.Group>
                                 </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
+                        <Modal isOpen={this.state.showModal2} /* onClose={() => this.setState({showModal2: false})} bg={'transparent'} */>
+                            <Modal.Content maxWidth="400px">
+                                {/* <Modal.CloseButton /> */}
+                                <Modal.Header>Recapitulatif de la vente</Modal.Header>
+                                <Modal.Body space={2} justifyContent="center" direction="row">
+                                    <Spinner accessibilityLabel="Loading posts" />
+                                    <Heading color="primary.500" fontSize="md">
+                                        Veuillez patienter
+                                    </Heading>
+                                </Modal.Body>
+                                {/* <Modal.Footer>
+                                    <Button>
+                                        Loading
+                                    </Button>
+                                </Modal.Footer> */}
                             </Modal.Content>
                         </Modal>
                     </ScrollView>           
@@ -925,7 +921,7 @@ class Renseigner_service extends React.Component{
                                     </Text>
                                 :
                                    <Text  h5
-                                                color={argonTheme.COLORS.DEFAULT}
+                                            color={argonTheme.COLORS.DEFAULT}
                                         >
                                             modif: {this.params.params.choixproduit} du {this.params.params.date}
                                         </Text>
@@ -934,47 +930,45 @@ class Renseigner_service extends React.Component{
                         <Block style={styles.renseigner_card}>
                             <Block style={{flexDirection:"row", justifyContent:"space-between"}}>
                                 <Block card style={[styles.card, {justifyContent:"flex-start"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         Prix de ref: {this.params.params.prix_de_reference}
                                     </Text>
                                 </Block>
                                 <Block card style={[styles.card,{justifyContent:"flex-end"}]}> 
-                                    <Text h5 color="white">
+                                    <Text h5 color='white'>
                                         Prix tot ref: {this.state.prix_tot_ref}fcfa
                                     </Text>
                                 </Block>
                             </Block>
-                            <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 20 }}>
+                                <Text>{`ancien prix unitaire: ${this.state.old_prixunit} FCFA`}</Text>
                                 <Input type="numeric"
                                     right
                                     placeholder="entrer le nouveau prix unitaire"
                                     style={{
                                         borderColor: theme.COLORS.SUCCESS,
                                         borderRadius: 4,
-                                        backgroundColor: "#fff"
+                                        backgroundColor: '#fff'
                                     }}
-                                    help={`ancien prix unitaire: ${this.state.old_prixunit} FCFA`}
-                                    TopHelp
                                     onChangeText={(input) =>{this.calcul(input,"prix")}}
-                                    placeholderTextColor="black"
+                                    placeholderTextColor='black'
                                     iconContent={<Block />}
                                         
                                 />
                                 {!this.comparer().etat?<Text style={{color:'red',display:this.comparer().prefix==""? 'none':'flex'}}> {this.comparer().prefix} {this.comparer().suffix} </Text>:<Text style={{color:"#2ECC71"}}>{this.comparer().prefix}</Text>}
                             </Block >
-                                <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                                    <Text>{`ancienne quantite: ${this.state.old_qtite}`}</Text>
                                     <Input type="numeric"
                                         right
                                         placeholder="entrer la nouvelle quantite"
                                         style={{
                                             borderColor: theme.COLORS.SUCCESS,
                                             borderRadius: 4,
-                                            backgroundColor: "#fff"
+                                            backgroundColor: '#fff'
                                         }}
-                                        help={`ancienne quantite: ${this.state.old_qtite}`}
-                                        TopHelp
                                         onChangeText={(input) =>this.calcul(input,"qte")}
-                                        placeholderTextColor="black"
+                                        placeholderTextColor='black'
                                         iconContent={<Block />}
                                     />
                                 </Block>
@@ -982,13 +976,14 @@ class Renseigner_service extends React.Component{
                                     <Text style={{marginBottom:-10}}>{this.state.newDate}</Text>    
                                     <Day OnDateChange={this.OnDateChange}/>
                                 </Block >
-                                <Block  flex={1.25} middle>
-                                    <Button style={{paddingHorizontal: theme.SIZES.BASE,  marginTop:10, backgroundColor:"#2ECC71",marginBottom:10, width:"93%"}}/* style={styles.uploadButton} */ 
+                                <Block  flex={1.25} middle style={{paddingHorizontal: theme.SIZES.BASE, marginTop:10}}>
+                                    <Button style={{paddingHorizontal: theme.SIZES.BASE,  marginTop:10, backgroundColor:'#2ECC71',marginBottom:10, width:"93%"}}/* style={styles.uploadButton} */ 
                                     onPress={this._pickImage} > JUSTIFICTIF DE LA VENTE </Button>
                                     {image && <Image source={{ uri:image}} style={{ width: 200, height: 200 }} /> }
                                 </Block>
                                 { this.params.params.reprise=="non"?
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                                        <Text> Raison de la modif </Text>
                                         <Input
                                             right
                                             placeholder="commentaire (max 2 lignes)"
@@ -996,36 +991,34 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff",
+                                                backgroundColor: '#fff',
                                                 marginBottom:10
                                             }}
-                                            help="raison de la modif"
-                                            TopHelp
-                                            placeholderTextColor="black"
+                                            placeholderTextColor='black'
                                             onChangeText={(input) =>{this.setState({raison_modif:input})}}
                                             iconContent={<Block />}
                                         />
                                     </Block>
                                     :
                                     
-                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                                    <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                                        <Text>commentaire du responsable</Text>
                                         <Input
                                             right
                                             placeholder={this.params.params.raison_responsable}
                                             maxLength={100}
                                             style={{
-                                            borderColor: theme.COLORS.SUCCESS,
-                                            borderRadius: 4,
-                                            backgroundColor: "#fff"
+                                                borderColor: theme.COLORS.SUCCESS,
+                                                borderRadius: 4,
+                                                backgroundColor: '#fff',
+                                                marginBottom:10
                                             }}
-                                            help="commentaire du responsable"
-                                            TopHelp
-                                            placeholderTextColor="grey"
+                                            placeholderTextColor='grey'
                                             iconContent={<Block />}
                                             editable={false}
                                             
                                         />
-                    
+                                        <Text>nouveau commentaire </Text>
                                         <Input
                                             right
                                             placeholder="commentaire (max 2 lignes)"
@@ -1033,12 +1026,10 @@ class Renseigner_service extends React.Component{
                                             style={{
                                                 borderColor: theme.COLORS.SUCCESS,
                                                 borderRadius: 4,
-                                                backgroundColor: "#fff",
+                                                backgroundColor: '#fff',
                                                 marginBottom:10
                                             }}
-                                            help="nouveau commentaire "
-                                            TopHelp
-                                            placeholderTextColor="black"
+                                            placeholderTextColor='black'
                                             onChangeText={(input) =>{this.setState({raison_modif:input})}}
                                             iconContent={<Block />}
                                         />
@@ -1047,19 +1038,19 @@ class Renseigner_service extends React.Component{
                                 }
                                 <Block style={{flexDirection:"row", justifyContent:"space-between",marginTop:10}}>
                                     <Block card style={[styles.card,{justifyContent:"flex-start"}]}> 
-                                        <Text h5 color="white">
+                                        <Text h5 color='white'>
                                             var tot: {this.state.variation}fcfa
                                         </Text>
                                     </Block>
                                     <Block card  style={[styles.card,{justifyContent:"flex-end"}]}> 
-                                        <Text h5 color="white">
+                                        <Text h5 color='white'>
                                             Prix tot: {this.state.prix_tot}fcfa
                                         </Text>
                                     </Block>
                                 </Block>
                         </Block>
                         <Block flex={1.25} right>
-                            <Button center color="default" 
+                            <Button center color='default' 
                                 style={styles.optionsButtonmodif} 
                                 onPress={() => {this.envoyerModifier()}}>
                                 ENVOYER
@@ -1143,7 +1134,8 @@ const styles= StyleSheet.create({
     },
     service_card:{
         width: "auto", 
-        height:50,
+        /* height:50, */
+        height: "auto",
         backgroundColor:argonTheme.COLORS.SWITCH_OFF,
         marginHorizontal:5,
         marginTop:20,
@@ -1154,41 +1146,42 @@ const styles= StyleSheet.create({
         
     },
     renseigner_card:{
-
         padding: theme.SIZES.BASE,
         marginHorizontal:5,
         borderTopLeftRadius: 6,
         borderTopRightRadius: 6,
         height:"auto",
         backgroundColor: theme.COLORS.WHITE,
-        shadowColor: "black",
+        shadowColor: 'black',
         shadowOffset: { width: 2, height: 4 },
         shadowRadius: 8,
         shadowOpacity: 100,
         width:"auto"
     },
     card:{
-        backgroundColor:"#2ECC71",
+        backgroundColor: '#2ECC71',
         width:"50%", 
         height:"auto", 
         paddingHorizontal: theme.SIZES.BASE,
     },
     optionsButtonr: {
         width: "auto",
-        height: 34,
+        /* height: 34, */
+        height: "auto",
         paddingHorizontal: "auto",
         paddingVertical: 10,
-        backgroundColor:"orange",
+        backgroundColor: 'orange',
         marginBottom:10,
         marginRight:theme.SIZES.BASE/5,
           
       },
     optionsButtonl: {
         width: "auto",
-        height: 34,
+        /* height: 34, */
+        height: "auto",
         paddingHorizontal: theme.SIZES.BASE/5,
         paddingVertical: 10,
-        backgroundColor:"orange",
+        backgroundColor: 'orange',
         //marginTop:-45,
         marginBottom:10,
         marginLeft:theme.SIZES.BASE/5
@@ -1197,10 +1190,11 @@ const styles= StyleSheet.create({
     },
     optionsButtonm: {
         width: "auto",
-        height: 34,
+        /* height: 34, */
+        height: "auto",
         paddingHorizontal: theme.SIZES.BASE/5,
         paddingVertical: 10,
-        backgroundColor:"orange",
+        backgroundColor: 'orange',
         //marginTop:-35,
         marginBottom:10,
         marginHorizontal:theme.SIZES.BASE/5
@@ -1212,7 +1206,7 @@ const styles= StyleSheet.create({
         height: 34,
         paddingHorizontal: theme.SIZES.BASE,
         paddingVertical: 10,
-        backgroundColor:"orange",
+        backgroundColor: 'orange',
         marginTop:10,
         marginBottom:10,
         marginRight:theme.SIZES.BASE*1.1,
@@ -1221,11 +1215,12 @@ const styles= StyleSheet.create({
       },
     uploadButton: {
         width:"100%",
-        height: 50,
+        //height: 50,
+        height: "auto",
         paddingHorizontal: theme.SIZES.BASE/2,
         paddingVertical: 10,
         marginTop:10,
-        backgroundColor:"#2ECC71",
+        backgroundColor: '#2ECC71',
         marginBottom:10,
         fontSize:50
     },

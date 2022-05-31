@@ -27,8 +27,8 @@ class Register extends React.Component {
         password:'',
         params:[]
       }
-
     }
+    
     updateValue(input, field){
       if(field=='username'){
         this.setState({
@@ -63,14 +63,14 @@ class Register extends React.Component {
         redirect: 'follow'
       };
     //const racine = 'http://172.22.32.1/Tracking/public/api/';
-    const racine = 'http://tracking.socecepme.com/api/';
+    const racine = 'https://tracking.socecepme.com/api/';
     fetch(racine + 'login', requestOptions)
       .then(response => response.text())
       .then(result => { 
         var rslt = JSON.parse(result);
         console.log(rslt);
         console.log(rslt['user'].contact);
-        if(rslt["status"]=="ok"){
+        if(rslt["status"]==="ok"){
            this.props.navigation.navigate('Home',{
             screen:'Home',//donne sans et avec ca
             params:{"id":rslt['user'].id,"contact":rslt['user'].contact, "type":rslt['user'].type, "entreprise_id":rslt['user'].entreprise_id,"raison_social":rslt['entreprise'].raison_social, "nom":rslt['user'].nom, "poste":rslt['user'].poste, "photo":rslt['user'].photo, "email":rslt['user'].email, "pass":rslt['user'].password, "equipe_id":rslt['user'].equipe_id, "username":rslt['user'].username},
@@ -89,9 +89,9 @@ class Register extends React.Component {
         <Block flex middle>
           <StatusBar hidden />
           <ImageBackground
-              source={Images.RegisterBackground}
-              style={{ width, height }}
-            >
+            source={Images.RegisterBackground}
+            style={{ width, height }}
+          >
             <ScrollView>
               <Image
                 style={styles.tinyLogo}

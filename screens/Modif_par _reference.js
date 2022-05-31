@@ -336,7 +336,7 @@ class Modif_par_reference extends React.Component{
                     </Block>
                   </Block>
                   {
-            (this.state.choixentrpse=='KmerFood'||this.state.choixentrpse=='Agripeel'||this.state.choixentrpse=='Wecare SCI' || typeof backparams!=='undefined'&& backparams.choixentrpse=="KmerFood"||typeof backparams!=='undefined'&& backparams.choixentrpse=="Wecare SCI" ||typeof backparams!=='undefined'&& backparams.choixentrpse=="Tropical" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Agripeel")?
+            (this.state.choixentrpse=='KmerFood' || this.state.choixentrpse=='Agripeel' || this.state.choixentrpse=='Wecare SCI' || typeof backparams!=='undefined'&& backparams.choixentrpse=="KmerFood" ||  backparams!=='undefined'&& backparams.choixentrpse=="Wecare SCI" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Tropical" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Agripeel")?
             <Block>
               <Text /* style={{marginTop:20}} */>Choisir une categorie de produit</Text>
               <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>

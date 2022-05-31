@@ -328,9 +328,7 @@ function CommissionStack(props) {
         }}
         
       />
-      
     </Stack.Navigator>
-    
   );
 }
 

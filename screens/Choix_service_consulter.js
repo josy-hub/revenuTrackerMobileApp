@@ -36,8 +36,8 @@ const placeholder3 = {
   color: 'black',
 };
 const placeholder4 = {
-  label: 'categorie',
-  value: null,
+  label: 'tout',
+  value: 'categorie',
   color: '#9EA0A4',
 };
 const placeholder5 = {
@@ -110,7 +110,7 @@ class Choix_service_consulter extends React.Component {
 
   async choixcategorie(value){
     this.setState({choixentrpse:value});
-    let table=['KmerFood','Agripeel','Wecare SCI','Tropical'];
+    let table=['KmerFood','Agripeel','Wecare SCI','Tropical', 'PEEX', 'Wecare Logistic', 'WecareFood'];
     const services = await entreprise.fetchProduits(value);
     let test=0, cats=[];
     console.log('ssssssssssss', services);    
@@ -148,7 +148,7 @@ class Choix_service_consulter extends React.Component {
 
   async choixservice(value){
     
-    this.setState({choixcat:value});
+    this.setState({categorie:value});
       var test=0; var prods=[];
        this.state.services.map(item => (item.categorie==value?
         prods.push(item.nom): 
@@ -183,7 +183,7 @@ class Choix_service_consulter extends React.Component {
   choixcuvee(value){
     var test=0, cuvees=[], tabprod_id=[];
     this.setState({choixprdt:value});
-    /* let cuvees= */this.state.services.map(item => (item.categorie==this.state.choixcat && item.nom==value?
+    /* let cuvees= */this.state.services.map(item => (item.categorie==this.state.categorie && item.nom==value?
     cuvees.push({
       label: item.cuvee,
       value: item.cuvee
@@ -239,7 +239,18 @@ class Choix_service_consulter extends React.Component {
       this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":"entreprise", "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {
+          "startDate":this.state.startDate,
+          "endDate":this.state.endDate,
+          "user_id":this.params.params.user_id,
+          "user_type":this.params.params.user_type,
+          "entreprise":"entreprise",
+          "groupe":this.state.choixgrpe,
+          "categorie":'categorie',
+          "service_prdt":"service",
+          "contact":this.params.params.contact,
+          "cuvee":this.state.choixcuvee },
+          "poste": this.params.params.poste,
       });
     }
     else if (
@@ -250,7 +261,19 @@ class Choix_service_consulter extends React.Component {
       this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {
+          "startDate":this.state.startDate,
+          "endDate":this.state.endDate,
+          "user_id":this.params.params.user_id,
+          "user_type":this.params.params.user_type,
+          "entreprise":this.state.choixentrpse,
+          "groupe":this.state.choixgrpe,
+          "categorie":'categorie',
+          "service_prdt":"service",
+          "contact":this.params.params.contact,
+          "cuvee":this.state.choixcuvee,
+          "poste": this.params.params.poste,
+        },
       });
     } 
     else if (
@@ -262,7 +285,19 @@ class Choix_service_consulter extends React.Component {
       this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":this.state.categorie, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {
+          "startDate":this.state.startDate,
+          "endDate":this.state.endDate,
+          "user_id":this.params.params.user_id,
+          "user_type":this.params.params.user_type,
+          "entreprise":this.state.choixentrpse,
+          "groupe":this.state.choixgrpe,
+          "categorie":this.state.categorie,
+          "service_prdt":this.state.choixprdt,
+          "contact":this.params.params.contact,
+          "cuvee":this.state.choixcuvee,
+          "poste": this.params.params.poste,
+        },
       });
     } 
     else if (
@@ -275,7 +310,19 @@ class Choix_service_consulter extends React.Component {
       this.state.etat === "good"
     ) {
       this.props.navigation.navigate("ConsulterRevenus", {
-        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":this.state.categorie, "service_prdt":this.state.choixprdt, "contact":this.params.params.contact, "categorie":this.state.choixcat, "cuvee":this.state.choixcuvee },
+        params: {
+          "startDate":this.state.startDate,
+          "endDate":this.state.endDate,
+          "user_id":this.params.params.user_id,
+          "user_type":this.params.params.user_type,
+          "entreprise":this.state.choixentrpse,
+          "groupe":this.state.choixgrpe,
+          "categorie":this.state.categorie,
+          "service_prdt":this.state.choixprdt,
+          "contact":this.params.params.contact,
+          "cuvee":this.state.choixcuvee,
+          "poste": this.params.params.poste,
+        },
       });
     } 
     else {
@@ -304,6 +351,18 @@ class Choix_service_consulter extends React.Component {
       this.props.navigation.navigate("Rapports", {
         params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "categorie":'categorie', "service_prdt":"service", "contact":this.params.params.contact },
       });
+    }
+    else if (
+      this.state.choixgrpe !== "toutgrpe" &&
+      this.state.choixentrpse !== "toutentr" &&
+      this.state.categorie === "categorie" &&
+      this.state.startDate !== "null" &&
+      this.state.endDate !== "null"&&
+      this.state.etat === "good"
+    ) {
+      this.props.navigation.navigate("Rapports", {
+        params: {"startDate":this.state.startDate, "endDate":this.state.endDate, "user_id":this.params.params.user_id,"user_type":this.params.params.user_type, "entreprise":this.state.choixentrpse, "groupe":this.state.choixgrpe, "service_prdt":this.state.choixprdt,"categorie":this.state.categorie, "contact":this.params.params.contact },
+      });
     } 
     else if (
       this.state.choixgrpe !== "toutgrpe" &&
@@ -325,8 +384,7 @@ class Choix_service_consulter extends React.Component {
   render() {
     const { navigation, route } = this.props;
     const { params } = route.params; 
-    console.log(this.state.choixentrpse);
-    
+    console.log('cuveee', this.state.cuvees)
     return (
       <Block style={styles.choixservice_container}>
         <ScrollView>
@@ -346,7 +404,7 @@ class Choix_service_consulter extends React.Component {
             <Block>
               <Block space="between" style={styles.choix_card}>
                 <Text>Choisir un groupe</Text>
-                <Block card>
+                <Block card style={{ borderColor: theme.COLORS.SUCCESS}}>
                   <RNPickerSelect
                     style={{
                       //placeholder: {color: "black"},
@@ -359,7 +417,7 @@ class Choix_service_consulter extends React.Component {
                   />
                 </Block>
                 <Text style={{ marginTop: 20 }}>Choisir une entreprise</Text>
-                <Block card style={{ marginBottom: 20 }}>
+                <Block card style={{ marginBottom: 20, borderColor: theme.COLORS.SUCCESS}}>
                   <RNPickerSelect
                     style={{
                       //placeholder: {color: "black"},
@@ -377,7 +435,7 @@ class Choix_service_consulter extends React.Component {
                 {
                   (this.state.choixentrpse === 'KmerFood' || this.state.choixentrpse === 'Agripeel' || this.state.choixentrpse === 'WecareFood')?
                   <Block>
-                    <Text >Choisir une categorie de produit</Text>
+                    <Text>Choisir une categorie de produit</Text>
                     <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
                       <RNPickerSelect
                         style={{
@@ -386,7 +444,6 @@ class Choix_service_consulter extends React.Component {
                           inputAndroid: { color: "black" },
                         }}
                         placeholder={placeholder4}
-                        value={this.state.choixcat}
                         onValueChange={(value) => this.choixservice(value)}
                         items={this.state.categories}
                       /> 
@@ -446,14 +503,14 @@ class Choix_service_consulter extends React.Component {
                           }}
                           placeholder={placeholder3}
                           value={this.state.choixprdt} 
-                          onValueChange={(value) =>this.choixcuvee(value) }
+                          onValueChange={(value) => this.setState({choixprdt:value}) }
                           items={this.state.service}
                         />  
                     </Block>
                   </Block>:
                   <Block>
                     <Text>Choisir un service</Text>
-                    <Block card>
+                    <Block card style={{ borderColor: theme.COLORS.SUCCESS }}>
                       <RNPickerSelect
                         style={{
                           //placeholder: {color: "black"},
@@ -491,7 +548,7 @@ class Choix_service_consulter extends React.Component {
             <Block>
               <Block space="between" style={styles.choix_card}>
                 <Text>Choisir un groupe</Text>
-                <Block card>
+                <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
                   <RNPickerSelect
                     style={{
                       //placeholder: {color: "black"},
@@ -504,7 +561,7 @@ class Choix_service_consulter extends React.Component {
                   />
                 </Block>
                 <Text style={{ marginTop: 20 }}>Choisir une entreprise</Text>
-                <Block card style={{ marginBottom: 20 }}>
+                <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS}}>
                   <RNPickerSelect
                     style={{
                       //placeholder: {color: "black"},
@@ -513,7 +570,8 @@ class Choix_service_consulter extends React.Component {
                     }}
                     placeholder={placeholder2}
                     onValueChange={(value) =>
-                      this.setState({choixentrpse:value})
+                      /* this.setState({choixentrpse:value}) */
+                      this.choixcategorie(value)
                     }
                     items={this.state.entreprises}
                   />
@@ -528,22 +586,24 @@ class Choix_service_consulter extends React.Component {
                 )?
                   <Block>
                     <Text>Choisir une categorie</Text>
-                    <Block card>
+                    <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
                       <RNPickerSelect
                         style={{
                           //placeholder: {color: "black"},
                           inputIOS: { color: "black" },
                           inputAndroid: { color: "black" },
                         }}
-                        placeholder={placeholder3}
-                        onValueChange={(value) => this.setState({ categorie: value })}
+                        placeholder={placeholder4}
+                        onValueChange={(value) => 
+                          /* this.setState({ categorie: value }) */
+                          this.choixservice(value)
+                        }
                         items={this.state.categories}
                         placeholderTextColor="black"
-                        disabled
                       />
                     </Block>
                     <Text>Choisir un service</Text>
-                    <Block card>
+                    <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
                       <RNPickerSelect
                         style={{
                           //placeholder: {color: "black"},
@@ -563,7 +623,7 @@ class Choix_service_consulter extends React.Component {
                   </Block>:
                   <Block>
                     <Text>Choisir un service</Text>
-                    <Block card>
+                    <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
                       <RNPickerSelect
                         style={{
                           //placeholder: {color: "black"},

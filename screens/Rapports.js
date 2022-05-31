@@ -45,13 +45,13 @@ export default class Rapports extends Component {
     .then(response => response.text())
     .then(result => {
       console.log('rapport' + result);
-      console.log(JSON.stringify(result, null, 4));
+      //console.log(JSON.stringify(result, null, 4));
       var rslt = JSON.parse(result);
       let header = rslt['header'];
       let body = rslt['body'];
-      let footer = ['footer'];
+      let footer = rslt['footer'];
       this.setState({header, body, footer, isLoading:false});
-      console.log(JSON.stringify(rslt['body']));
+      console.log(JSON.stringify(rslt['footer']));
     })
     .catch(error => {
       console.log(error);
@@ -80,12 +80,12 @@ export default class Rapports extends Component {
     const { navigation, route } = this.props;
     const { params } = route.params;
     const {isLoading} = this.state;
-    
+    console.log('parrrrams', params)
     let widthArr=[];
-    
     for(let i=0; i<state.header.length; i++){
       widthArr.push(180);
     }
+    console.log("footer", state.footer)
     //Rapport de vente de tous les produits d'une entreprise et par categorie
     if(params.service_prdt === "toutprod" && params.user_type>=2 && params.user_type<=8)
     {
@@ -106,7 +106,7 @@ export default class Rapports extends Component {
                   <Text  h1
                     style={styles.caption}
                   >
-                      Rapport des ventes de: {params.entreprise} {params.categorie} du {params.startDate} au {params.endDate}
+                    Rapport des ventes de: {params.entreprise} categorie {params.categorie} du {params.startDate} au {params.endDate}
                   </Text>
                 </Block> 
                 <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -322,7 +322,7 @@ export default class Rapports extends Component {
  
 const styles = StyleSheet.create({
   globale_container:{
-       flex:1,
+    flex:1,
   },
   container: { 
     //width:width,

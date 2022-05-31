@@ -92,7 +92,7 @@
         tablefssrs:[],
         type_vente:'individuelle',
         produit_id:'',
-        tabprod_id:[]
+        tabprod_id:[],
       };
       const { route } = this.props;
       this.params=route.params;
@@ -134,7 +134,7 @@
 
     async choixcategorie(value){
       this.setState({choixentrpse:value});
-      let table=['KmerFood','Agripeel','Wecare SCI','Tropical'];
+      let table=['KmerFood','Agripeel','Wecare SCI','Tropical', 'PEEX', 'Wecare Logistic', 'WecareFood'];
       const services = await entreprise.fetchProduits(value);
       let test=0, cats=[], categories=[];
       console.log('ssssssssssss', services);    
@@ -312,69 +312,68 @@
     }
     
     
-    sauvegarder=async()=>{
-
+    sauvegarder = async() => {
+      const{route, navigation}=this.props;
+      const {params}  = route.params;
+      const {backparams}  = route.params;
       var date =new Date();
       var s = date.getSeconds();
       var m= date.getMinutes();
       var h= date.getHours();
+      console.log(backparams);
   
-      if(this.state.choixgrpe!=null || typeof backparams!=='undefined' && backparams.choixgrpe!=null){
-        let data={
-          groupe:this.state.choixgrpe==null?backparams.choixgrpe:backparams.choixgrpe,
-          entreprise:this.state.choixentrpse,
-          service_produit:this.state.choixprdt,
-          date_vente:this.state.newDate=="aucune date choisie"? null:this.state.newDate,
-          prix_unitaire:null,
-          quantite:null,
-          justificatif_vente:null,
-          commentaire:null,
-          produit_id:null,
-          user_contact:this.params.params.contact,
-          prix_reference:null,
-          categorie:this.state.categorie,
-          cuvee:this.state.choixcuvee,
-          remise:null,
-          type_fournisseur:this.state.choixtypefssr,
-          nom_fournisseur:this.state.fsseurExt!=null?this.state.fsseurExt:this.state.choixfssr,
-          type_de_vente:this.state.type_vente,
-          mode_de_paiement:null,
-          groupe_de_vente_id:this.state.type_vente=='groupee'?date+':'+h+':'+m+':'+s:null
+      if(this.state.choixgrpe!=null || typeof backparams !== 'undefined') { /* && backparams.choixgrpe !== null */
 
-        }
-        var myHeaders = new Headers();
-        myHeaders.append("Accept", "application/json");
-        myHeaders.append("Content-Type", "application/json");
-        var raw = JSON.stringify(data);
+        var formdata = new FormData();
+          formdata.append("groupe", this.state.choixgrpe === null ? backparams.choixgrpe : this.state.choixgrpe);
+          formdata.append("entreprise", this.state.choixentrpse);
+          formdata.append("service_produit", this.state.choixprdt);
+          formdata.append("date_vente", this.state.newDate=="aucune date choisie"? null : this.state.newDate);
+          formdata.append("quantite", null);
+          formdata.append("commentaire", null);
+          formdata.append("prix_unitaire", null);
+          formdata.append("justificatif_vente", null);
+          formdata.append("prix_reference", null);
+          formdata.append("user_contact", this.params.params.contact);
+          formdata.append("categorie", this.state.categorie);
+          formdata.append("cuvee", this.state.choixcuvee);
+          formdata.append("remise", null);
+          formdata.append("type_fournisseur", this.state.choixtypefssr);
+          formdata.append("nom_fournisseur", this.state.fsseurExt!=null?this.state.fsseurExt:this.state.choixfssr);
+          formdata.append("type_de_vente", this.state.type_vente);
+          formdata.append("groupe_de_vente_id", this.state.type_vente === 'groupee' ? date+':'+h+':'+m+':'+s:null);
+          formdata.append("mode_de_paiement", 1);
+          //formdata.append("mode", 1);
+
         var requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-            redirect: 'follow'
+          method: 'POST',
+          body: formdata,
+          redirect: 'follow'
         };
+
         const URL=`${racine}sauvegarde`;
         
         fetch(URL, requestOptions)
         .then(response => response.text())
         .then(result => {
-            console.log('Success:', result);
-            Alert.alert("Donnees sauvegardees avec succes. Vous pouvez continuer plus tard");
-            this.setState({
-              choixgrpe:null,
-              choixentrpse:null,
-              choixprdt:null,
-              choixcat:null,
-              choixcuvee:null,
-              choixfssr:null,
-              choixtypefssr:null,
-              fsseurExt:null,
-              newDate:"aucune date choisie",
-              type_vente:'individuelle'
-            })
+          console.log('Success:', result);
+          Alert.alert("Donnees sauvegardees avec succes. Vous pouvez continuer plus tard");
+          this.setState({
+            choixgrpe:null,
+            choixentrpse:null,
+            choixprdt:null,
+            choixcat:null,
+            choixcuvee:null,
+            choixfssr:null,
+            choixtypefssr:null,
+            fsseurExt:null,
+            newDate:"aucune date choisie",
+            type_vente:'individuelle'
+          })
         })
         .catch((error) => {
-            console.error('Error:', error);
-            Alert.alert("Erreur: vos donnees n'ont pas pu est sauvegardees");
+          console.error('Error:', error);
+          Alert.alert("Erreur: vos donnees n'ont pas pu est sauvegardees");
         });
       }
       else{
@@ -384,7 +383,7 @@
     }
     
     sauvegardes(){
-      this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:"choixservice"}})
+      this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:1}})
     }
     suivant()
     {
@@ -463,12 +462,12 @@
             "prix_ref":backparams.prix_ref,
             "contact":params.contact,
             "categorie":backparams.categorie,
-            "cuvee":backparams.choixcuvee,
+            "cuvee":backparams.cuvee,
             //"fournisseur_id":backparams.fssr_id,
-            "type_de_vente":backparams.type_vente,
-            "groupe_de_vente_id":backparams.groupe_vente_id,
-            "choixtypefssr":backparams.choixtypefssr,
-            "choixfssr":backparams.choixfssr,
+            "type_de_vente":backparams.type_de_vente === null && this.state.type_vente ,
+            "groupe_de_vente_id":backparams.groupe_de_vente_id,
+            "choixtypefssr":backparams.type_fournisseur,
+            "choixfssr":backparams.nom_fournisseur,
             "fsseurExt":backparams.fsseurExt
 
           }
@@ -540,7 +539,7 @@
                   /> 
                 </Block>
                 {
-                  (this.state.choixentrpse=='Tropical'||this.state.choixentrpse=='KmerFood'||this.state.choixentrpse=='Agripeel'||this.state.choixentrpse=='Wecare SCI' || typeof backparams!=='undefined'&& backparams.choixentrpse=="KmerFood"||typeof backparams!=='undefined'&& backparams.choixentrpse=="Wecare SCI" ||typeof backparams!=='undefined'&& backparams.choixentrpse=="Tropical" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Agripeel")?
+                  (this.state.choixentrpse=='KmerFood' || this.state.choixentrpse === 'WecareFood' || this.state.choixentrpse=='Agripeel' || typeof backparams!=='undefined'&& backparams.choixentrpse=="KmerFood" || typeof backparams!=='undefined'&& backparams.choixentrpse=="WecareFood" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Agripeel")?
                   <Block>
                     <Text /* style={{marginTop:20}} */>Choisir une categorie de produit</Text>
                     <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
@@ -584,7 +583,7 @@
                         items={this.state.cuvees}
                       />  
                     </Block>
-                    {this.state.choixentrpse!="Tropical" && this.state.choixentrpse!="Agripeel"?
+                    { this.state.choixentrpse!="Agripeel"?
                       <Block>
                         <Text>Type de fournisseur</Text>
                         <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
@@ -603,7 +602,7 @@
                       </Block>
                     :null}
                     {
-                      this.state.choixtypefssr=='interne'|| typeof backparams!=='undefined' && backparams.type_fournisseur=='interne'?
+                      this.state.choixtypefssr === 'interne'|| typeof backparams!=='undefined' && backparams.type_fournisseur=='interne'?
                       <Block>
                         <Text>choisir le fournisseur</Text>
                         <Block card style={{borderColor: theme.COLORS.SUCCESS,}}>
@@ -620,7 +619,7 @@
                           />  
                         </Block>
                       </Block>
-                    : this.state.choixtypefssr=='externe'|| typeof backparams!=='undefined' && backparams.type_fournisseur=='externe'?
+                    : this.state.choixtypefssr === 'externe'|| typeof backparams!=='undefined' && backparams.type_fournisseur=='externe'?
                     <Block >
                       <Autocomplete
                         autoCapitalize="none"
@@ -652,7 +651,49 @@
                       />
                     </Block>:null
                     }
-                    
+                  </Block>:
+                  (
+                    this.state.choixentrpse === 'Wecare SCI' ||
+                    this.state.choixentrpse === 'PEEX' ||
+                    this.state.choixentrpse === 'Tropical' ||
+                    this.state.choixentrpse === 'Wecare Logistic' ||
+                    typeof backparams !== 'undefined' &&
+                    backparams.choixentrpse === "Wecare SCI" ||
+                    typeof backparams !== 'undefined' &&
+                    backparams.choixentrpse === "PEEX" ||
+                    typeof backparams !== 'undefined' && backparams.choixentrpse === "Tropical" ||
+                    typeof backparams!=='undefined' && backparams.choixentrpse === "Wecare Logistic"
+
+                  )?
+                  <Block>
+                    <Text >Choisir une categorie de produit</Text>
+                    <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+                      <RNPickerSelect
+                        style={{
+                        // placeholder: {color: "black"},
+                          inputIOS: { color: "black" },
+                          inputAndroid: { color: "black" },
+                        }}
+                        placeholder={placeholder4}
+                        value={this.state.choixcat}
+                        onValueChange={(value) => this.choixservice(value)}
+                        items={this.state.categories}
+                      /> 
+                    </Block>
+                    <Text>Choisir un service/produit</Text>
+                    <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>
+                        <RNPickerSelect
+                          style={{
+                            //placeholder: {color: "black"},
+                            inputIOS: { color: "black" },
+                            inputAndroid: { color: "black" },
+                          }}
+                          placeholder={placeholder3}
+                          value={this.state.choixprdt} 
+                          onValueChange={(value) =>this.setState({choixprdt:value}) }
+                          items={this.state.service}
+                        />  
+                    </Block>
                   </Block>:
                   <Block>
                     <Text>Choisir un service</Text>

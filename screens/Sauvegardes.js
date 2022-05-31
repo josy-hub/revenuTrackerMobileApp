@@ -1,6 +1,6 @@
 import react from "react";
 import React from "react";
-import {StyleSheet, ScrollView, Dimensions, Alert} from "react-native";
+import {StyleSheet, ScrollView, Dimensions, Alert, ActivityIndicator} from "react-native";
 import { Block, Text,theme} from "galio-framework";
 import Storage from 'react-native-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +17,7 @@ class Sauvegardes extends React.Component{
             myArray:[],
             annuler:false,
             key:'',
+            isLoading: true,
         };
     }
    async componentDidMount(){
@@ -27,7 +28,7 @@ class Sauvegardes extends React.Component{
         console.log("SSSSauvegardes",sauvegardes);
         if(sauvegardes.status=='ok' && sauvegardes.sauvegardes.length>0){
             let myArray=sauvegardes.sauvegardes;
-            this.setState({ myArray});
+            this.setState({ myArray, isLoading: false});
         }
         else{
             alert('desole pas de sauvegardes disponibles');
@@ -47,7 +48,7 @@ class Sauvegardes extends React.Component{
     {
         const{route}=this.props;
         const {params}  = route.params;
-        if(params.place=="choixservice"){
+        if(params.place === 1){
             let collection={
                 choixgrpe:groupe,
                 choixentrpse:entreprise,
@@ -65,7 +66,7 @@ class Sauvegardes extends React.Component{
               this.props.navigation.navigate('ChoixServiceRenseigner',{backparams:collection});
 
         }
-        else if(params.place=="renseignerservice"){          
+        else if(params.place === 2){          
             let elements={
                 choixgrpe:groupe,
                 choixentrpse:entreprise,
@@ -112,11 +113,12 @@ class Sauvegardes extends React.Component{
     render(){
         const{route, navigation}=this.props;
         const params  = route.params;
+        const { isLoading } = this.state;
         return(
             <Block style={styles.global_container}>
                 <ScrollView>
                     {this.state.myArray.map((Data,index)=> 
-                        this.state.annuler==false? 
+                        this.state.annuler === false && Data.mode === params.place? 
                         <Block card style={[styles.card,{marginTop:40}]} key={index}>
                             <Text>
                                 Sauvegarde {Data.groupe} du {Data.created_at}. 
@@ -192,6 +194,16 @@ class Sauvegardes extends React.Component{
                         </Block>
                     </Block>
                     )}
+                    <ActivityIndicator
+                        color="#00ff00"
+                        size="large"
+                        style = {{
+                            marginTop: 50,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                        animating ={isLoading}
+                    /> 
                 </ScrollView>
             </Block>
         );

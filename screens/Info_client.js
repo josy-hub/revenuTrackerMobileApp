@@ -42,13 +42,30 @@ class Info_client extends React.Component{
         const { route } = this.props;
         this.params=route.params;
     }
-
+    
     componentDidMount() {
-        fetch(`${API}/clients`).then(res => res.json()).then((json) => {
-          const {clients } = json;
-          console.log('clientssss',json)
-          this.setState({ clients });
-        });
+        console.log('bonjour')
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+        fetch(`${API}/clients`, requestOptions)
+        .then(response => response.text())
+        .then((result) => {
+            var rslt = JSON.parse(result);
+            if(rslt['status'] === 'ok' && rslt['clients'].length>0) {
+                let clients = rslt['clients'];
+                console.log('clientssss',clients)
+                this.setState({ clients });
+            }
+            else{
+                alert('desole pas de resultat disponible');
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            alert("erreur de chargement des donnees");
+          });
     }
 
     formatMillier( nombre){
@@ -90,7 +107,7 @@ class Info_client extends React.Component{
                 data.append("contact", this.params.params.contact);
                 data.append("localisation", this.params.params.siege_social);
                 data.append("vente_id", this.params.params.ventefssr_id);
-                fetch('http://tracking.socecepme.com/api/clients', {  
+                fetch(API + '/clients', {  
                     method: 'POST',
                     body: data
                 }).then(response => response.text())
@@ -107,7 +124,7 @@ class Info_client extends React.Component{
             formData.append("contact", this.state.contact);
             formData.append("localisation", this.state.localisation);
             formData.append("vente_id", this.params.params.vente_id);
-            fetch('https://tracking.socecepme.com/api/clients', {  
+            fetch(API + '/clients', {  
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
@@ -128,7 +145,7 @@ class Info_client extends React.Component{
                 data.append("contact", this.params.params.contact);
                 data.append("localisation", this.params.params.siege_social);
                 data.append("vente_id", this.params.params.ventefssr_id);
-                fetch('https://tracking.socecepme.com/api/clients', {  
+                fetch(API + '/clients', {  
                     method: 'POST',
                     body: data
                 }).then(response => response.text())
@@ -145,7 +162,7 @@ class Info_client extends React.Component{
             formData.append("contact", this.state.contact);
             formData.append("localisation", this.state.localisation);
             formData.append("vente_id", this.params.params.vente_id);
-            fetch('https://tracking.socecepme.com/api/clients', {  
+            fetch(API + '/clients', {  
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
@@ -164,13 +181,14 @@ class Info_client extends React.Component{
 
     render(){
         
-    const { navigation, route } = this.props;
-    const params  = route.params;
-    console.log('params',params);
-    const { nom, email, contact, localisation } = this.state;
-    const clients = this.findClient(nom);
-    const {isLoading} = this.state;
-    console.log(this.state);
+        const { navigation, route } = this.props;
+        const params  = route.params;
+        console.log('params', params);
+        const { nom, email, contact, localisation } = this.state;
+        const clients = this.findClient(nom);
+        const { isLoading } = this.state;
+        console.log("clients", clients);
+        let data=['test', 'josiane', 'essaie', 'yves', 'Yan']
         return(
             <Block style={styles.globale_container}>
                 <ScrollView keyboardShouldPersistTaps='always'>
@@ -191,7 +209,7 @@ class Info_client extends React.Component{
                     <Block style={styles.Info_card}>
                         <Text style={{ paddingHorizontal: theme.SIZES.BASE }}>Nom du client</Text>                
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-                            {/* <Input 
+                            <Input 
                                 right
                                 placeholder="Nom"
                                 style={{
@@ -199,13 +217,11 @@ class Info_client extends React.Component{
                                     borderRadius: 4,
                                     backgroundColor: "#fff"
                                 }}
-                                help="Nom du client"
-                                TopHelp
                                 onChangeText={(input) =>this.setState({nom:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
-                            /> */}
-                            <Autocomplete
+                            />
+                            {/* <Autocomplete
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 listContainerStyle={styles.listcontainer}
@@ -219,7 +235,7 @@ class Info_client extends React.Component{
                                 placeholder="Nom du client"
                                 placeholderTextColor="black"
                                 renderItem={({ item, i }) => (
-                                    <TouchableOpacity onPress={() =>{this.setState({ nom: item.nom_client, email:item.email,/* contact:item.contact ,*/ localisation:item.localisation, hide:true}), this.formatMillier(item.contact)}} 
+                                    <TouchableOpacity onPress={() =>{this.setState({ nom: item.nom_client, email:item.email, localisation:item.localisation, hide:true}), this.formatMillier(item.contact)}} 
                                         style={{
                                             height: 80,
                                             flex: 1,
@@ -234,9 +250,10 @@ class Info_client extends React.Component{
                                         <Text adjustsFontSizeToFit>{item.nom_client+':\t'+item.localisation+':\t'+item.contact+':\t'+item.email}</Text>
                                     </TouchableOpacity>
                                 )}  
-                            />
+                            /> */}
                         </Block>
-                        <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                        <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                            <Text>E-mail du client</Text>
                             <Input type='email-address'
                                 right
                                 placeholder="E-mail"
@@ -246,14 +263,13 @@ class Info_client extends React.Component{
                                     borderRadius: 4,
                                     backgroundColor: "#fff"
                                 }}
-                                help="E-mail du client"
-                                TopHelp
                                 onChangeText={(input) =>this.setState({email:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
                         </Block>
-                        <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                        <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                            <Text>contact du client</Text>
                             <Input type="numeric"
                                 right
                                 placeholder="contact"
@@ -264,14 +280,13 @@ class Info_client extends React.Component{
                                     borderRadius: 4,
                                     backgroundColor: "#fff",
                                 }}
-                                help="contact du client"
-                                TopHelp
                                 onChangeText={(input) =>this.formatMillier(input)}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
                         </Block>
-                        <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                        <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop: 10 }}>
+                            <Text>Localisation du client</Text>
                             <Input 
                                 right
                                 placeholder="Localisation du client"
@@ -281,8 +296,6 @@ class Info_client extends React.Component{
                                     backgroundColor: "#fff",
                                 }}
                                 value={localisation!='client lamda'? localisation: null}
-                                help="Localisation du client"
-                                TopHelp
                                 onChangeText={(input) =>this.setState({localisation:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
@@ -294,16 +307,9 @@ class Info_client extends React.Component{
                             style={styles.optionsButtonr} 
                             onPress={() => this.envoyer() }>
                             ENVOYER
-                            <ActivityIndicator
-                                color="#00ff00"
-                                size="large"
-                                style = {styles.activityIndicator}
-                                animating ={isLoading}
-                            /> 
                         </Button>
                     </Block>
                 </ScrollView>
-
             </Block>
 
         );

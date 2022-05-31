@@ -167,14 +167,8 @@ class Home extends React.Component {
                   </Block>
                   <TouchableOpacity
                     onPress={() =>
-                      this.props.navigation.navigate(
-                        "ChoixServiceConsulter",
-                        {
-                          
-                            params: {"user_id":params.id, "nom":params.nom, "contact":params.contact, "user_type":params.type,"entreprise_id":params.entreprise_id, "rapport":"non"}
-                          
-                        }
-                      )
+                      this.props.navigation.navigate( "ChoixServiceConsulter", {
+                        params:{ "user_id":params.id, "nom":params.nom, "contact":params.contact, "user_type":params.type, "entreprise_id":params.entreprise_id, "rapport":"non", "poste": params.poste}})
                     }
                   >
                     <CardHome

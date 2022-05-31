@@ -79,7 +79,7 @@ class Mes_parametres extends React.Component{
                 "password":this.state.oldpass,
                 "photo":this.state.photo
             }
-            let url=`http://tracking.socecepme.com/api/update/${this.state.user_id}/1`
+            let url=`https://tracking.socecepme.com/api/update/${this.state.user_id}/1`
 
             const putMethod = {
                 method: 'PUT', 
@@ -100,7 +100,7 @@ class Mes_parametres extends React.Component{
         }
         else if(this.state.newpass!='none' && this.state.confirmpass===this.state.newpass && update==2){
             
-            let URL='http://tracking.socecepme.com/api/login';
+            let URL='https://tracking.socecepme.com/api/login';
             
             let collection={
                 username:this.state.username,
@@ -143,7 +143,7 @@ class Mes_parametres extends React.Component{
                         "password":this.state.newpass,
                         "photo":this.state.photo
                     }
-                    let url=`http://tracking.socecepme.com/api/update/${this.state.user_id}/2`
+                    let url=`https://tracking.socecepme.com/api/update/${this.state.user_id}/2`
                     const putMethod = {
                         method: 'PUT', 
                         headers: {
@@ -183,12 +183,13 @@ class Mes_parametres extends React.Component{
                             style={{
                                 justifyContent:"center",
                                 alignItems:"center", 
-                                //marginHorizontal:5
+                                marginBottom: 10
                             }}
                             color={argonTheme.COLORS.DEFAULT}
                         >
                             Changer votre email
                         </Text>
+                        <Text>Adresse actuelle</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
                             <Input type='email-address'
                                 right
@@ -196,15 +197,15 @@ class Mes_parametres extends React.Component{
                                 style={{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
-                                    backgroundColor: "#fff"
+                                    backgroundColor: "#fff",
+                                    marginBottom: 10
                                 }}
-                                help="Adresse actuelle"
-                                TopHelp
                                 onChangeText={(input) =>this.setState({emailcompare:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
                         </Block>
+                        <Text>Nouvelle adresse</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
                             <Input type='email-address'
                                 right
@@ -212,10 +213,9 @@ class Mes_parametres extends React.Component{
                                 style={{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
-                                    backgroundColor: "#fff"
+                                    backgroundColor: "#fff",
+                                    marginBottom: 10
                                 }}
-                                help="Nouvelle adresse"
-                                TopHelp
                                 onChangeText={(input) =>this.setState({newemail:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
@@ -233,14 +233,15 @@ class Mes_parametres extends React.Component{
                     <Block style={styles.parametres_card}>
                     <Text  h4 
                             style={{
-                                justifyContent:"center",
-                                alignItems:"center", 
-                                //marginHorizontal:5
+                                justifyContent: "center",
+                                alignItems: "center", 
+                                marginBottom: 10
                             }}
                             color={argonTheme.COLORS.DEFAULT}
                         >
                             Changer votre mot de passe
                         </Text>
+                        <Text>Mot de passe actuel</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
                             <Input
                                 right
@@ -253,13 +254,12 @@ class Mes_parametres extends React.Component{
                                     borderRadius: 4,
                                     backgroundColor: "#fff"
                                 }}
-                                    help="Mot de passe  actuel"
-                                    TopHelp
-                                    placeholderTextColor="black"
-                                    iconContent={<Block />}
+                                placeholderTextColor="black"
+                                iconContent={<Block />}
                             />
                         </Block>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Text>Nouveau mot de passe</Text>
                             <Input
                                 right
                                 onChangeText={(input) =>this.setState({newpass:input})}
@@ -269,13 +269,13 @@ class Mes_parametres extends React.Component{
                                 style={{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
-                                    backgroundColor: "#fff"
+                                    backgroundColor: "#fff",
+                                    marginBottom: 10
                                 }}
-                                    help="Nouveau mot de passe"
-                                    TopHelp
-                                    placeholderTextColor="black"
-                                    iconContent={<Block />}
-                            />  
+                                placeholderTextColor="black"
+                                iconContent={<Block />}
+                            />
+                            <Text>confirmer le mot de passe</Text>  
                             <Input
                                 right
                                 onChangeText={(input) =>this.setState({confirmpass:input})}
@@ -287,10 +287,8 @@ class Mes_parametres extends React.Component{
                                     borderRadius: 4,
                                     backgroundColor: "#fff"
                                 }}
-                                    help="Confirmer le mot de passe"
-                                    TopHelp
-                                    placeholderTextColor="black"
-                                    iconContent={<Block />}
+                                placeholderTextColor="black"
+                                iconContent={<Block />}
                             />  
                         </Block>
                         <Block flex={1.25} right>

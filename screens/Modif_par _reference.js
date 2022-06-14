@@ -104,7 +104,7 @@ class Modif_par_reference extends React.Component{
   }
   async choixcategorie(value){
     this.setState({choixentrpse:value});
-    let table=['KmerFood','Agripeel','Wecare SCI','Tropical'];
+    let table=['KmerFood','Agripeel','Wecare SCI','Tropical', 'PEEX', 'Wecare Logistic', 'WecareFood'];
     const services = await requete.fetchProduits(value);
     let test=0, cats=[];
     console.log('ssssssssssss', services);    
@@ -171,18 +171,19 @@ class Modif_par_reference extends React.Component{
   }
 
   async reference(value){
-    let table=['KmerFood','Agripeel','Wecare SCI','Tropical'];
+    let table=['KmerFood','Agripeel','WecareFood'];
     if(table.includes(this.state.choixentrpse)) {
-      this.setState({choixcuvee:value});
+      this.setState({ choixcuvee:value });
       let references=[];
-      const ventes = await requete.fetchreference(this.state.choixentrpse,this.state.choixprdt, value);  
-      if(ventes.length>0) {
-        ventes.map(item =>(item.categorie==this.state.choixcat && item.cuvee==value? references.push({
+      const ventes = await requete.fetchreference(this.state.choixentrpse, this.state.choixprdt, value);  
+      console.log('vennnnntes', ventes)
+      if(ventes.status === 'ok' && ventes.ventes.length > 0) {
+        ventes.ventes.map(item =>(item.categorie==this.state.choixcat && item.cuvee==value? references.push({
           label: `${item.reference} du ${item.date_vente}`,
           value: `${item.reference} du ${item.date_vente}`
         }) :null));
         let prix_ref=0;
-        ventes.map(item=>(
+        ventes.ventes.map(item=>(
           item.categorie==this.state.choixcat && item.cuvee==value?
           prix_ref=item.prix_de_reference:null
         ));
@@ -194,19 +195,18 @@ class Modif_par_reference extends React.Component{
           label:"pas de reference", 
           value:"pas de reference"
         }]});
-        Alert.alert("Desole ce produit/service n'a jamais ete vendu!!!");
       }
     }
     else {
       this.setState({ choixprdt: value });
-      const ventes = await requete.fetchreference(this.state.choixentrpse,value);
-      if(ventes.length>0){
-        let references = ventes.map(item => ({
+      const ventes = await requete.fetchreference(this.state.choixentrpse, value);
+      if(ventes.status === 'ok' && ventes.ventes.length > 0){
+        let references = ventes.ventes.map(item => ({
           label: `${item.reference} du ${item.date_vente}`,
           value: `${item.reference} du ${item.date_vente}`
         }));
         let prix_ref=0;
-        ventes.map(item=>(
+        ventes.ventes.map(item=>(
           prix_ref=item.prix_de_reference
         ));
         this.setState({references:references});
@@ -217,7 +217,6 @@ class Modif_par_reference extends React.Component{
           label:"pas de reference", 
           value:"pas de reference"
         }]});
-        Alert.alert("Desole ce produit/service n'a jamais ete vendu!!!");
       }
     }
   }
@@ -251,7 +250,8 @@ class Modif_par_reference extends React.Component{
           "reprise":"non",
           "prix_de_reference":this.state.prix_ref,
           "type_vente":this.state.type_vente,
-          "groupe_de_vente_id":this.state.type_vente=='groupee'?date+':'+h+':'+m+':'+s:null
+          "groupe_de_vente_id":this.state.type_vente=='groupee'?date+':'+h+':'+m+':'+s:null,
+          'poste': this.params.params.poste
 
         }
       });
@@ -265,95 +265,167 @@ class Modif_par_reference extends React.Component{
 
   render(){
     const { navigation,route } = this.props;
-    const {params}=route.params
+    const { params } = route.params
+    const { backparams }=route.params
     return(
       <Block style={styles.global_container}>
-            <ScrollView>                
-              <Block 
-                  style={{ 
-                    marginHorizontal:20,
-                    marginTop:50,      
-                  }}>
-                  <Text  h4 
-                    color={argonTheme.COLORS.DEFAULT}>
-                    Renseigner les champs
-                  </Text>
-              </Block>
-              <Block style={styles.Reference_card}>
-                  <Text>filtrer</Text>
-                  <Block card style={{boderWeight:4, borderColor:"green"}}>   
-                      <RNPickerSelect 
-                        placeholder={placeholder1}
-                        onValueChange={(value) =>{ 
-                          if(value=='par reference de la vente'){
-                            navigation.navigate("ModifParReference") 
-                          }
-                          if(value=='par commercial'){
-                            navigation.navigate("ModifParCommercial",{
-                              params: {"user_id":params.user_id,"nom":params.nom,"contact":params.contact, "user_type":params.user_type,"entreprise_id":params.entreprise_id}
-                            }) 
-                          }} 
-                        }
-                        items={[
-                          { label: 'par reference de la vente', value: 'par reference de la vente'},
-                          { label: 'par commercial', value: 'par commercial' },
-                            
-                        ]}
-                      />
-                  </Block>
-                  <Block style={{marginTop:15, marginBottom:15}}> 
-                      <Text>Choisir un groupe</Text>
-                      <Block card style={{borderColor: theme.COLORS.SUCCESS, paddingHorizontal: theme.SIZES.BASE}}>
-                        <RNPickerSelect
-                          style={{
-                            //placeholder: {color: "black"},
-                            inputIOS: { color: "black" },
-                            inputAndroid: { color: "black" },
-                          }}
-                          placeholder={placeholder2}
-                          onValueChange={(value) =>
-                            this.choixentreprise(value)
-                          }
-                          items={this.state.groupes}
-                        />  
-                      </Block>
-                  </Block>
-                  <Block style={{marginTop:15, marginBottom:15}}> 
-                    <Text>Choisir une entreprise</Text>
-                    <Block card style={{borderColor: theme.COLORS.SUCCESS, paddingHorizontal: theme.SIZES.BASE}}>
-                      <RNPickerSelect
-                        style={{
-                          //placeholder: {color: "black"},
-                          inputIOS: { color: "black" },
-                          inputAndroid: { color: "black" },
-                        }}
-                        placeholder={placeholder3}
-                        onValueChange={(value) =>
-                          this.choixcategorie(value)
-                        }
-                        items={this.state.entreprises}
-                      />  
-                    </Block>
-                  </Block>
-                  {
-            (this.state.choixentrpse=='KmerFood' || this.state.choixentrpse=='Agripeel' || this.state.choixentrpse=='Wecare SCI' || typeof backparams!=='undefined'&& backparams.choixentrpse=="KmerFood" ||  backparams!=='undefined'&& backparams.choixentrpse=="Wecare SCI" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Tropical" || typeof backparams!=='undefined'&& backparams.choixentrpse=="Agripeel")?
-            <Block>
-              <Text /* style={{marginTop:20}} */>Choisir une categorie de produit</Text>
-              <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+        <ScrollView>                
+          <Block 
+            style={{ 
+              marginHorizontal:20,
+              marginTop:50,      
+            }}>
+            <Text  h4 
+              color={argonTheme.COLORS.DEFAULT}>
+              Renseigner les champs
+            </Text>
+          </Block>
+          <Block style={styles.Reference_card}>
+            {/* <Text>filtrer</Text>
+            <Block card style={{boderWeight:4, borderColor:"green"}}>   
+                <RNPickerSelect 
+                  placeholder={placeholder1}
+                  onValueChange={(value) =>{ 
+                    if(value=='par reference de la vente'){
+                      navigation.navigate("ModifParReference") 
+                    }
+                    if(value=='par commercial'){
+                      navigation.navigate("ModifParCommercial",{
+                        params: {"user_id":params.user_id,"nom":params.nom,"contact":params.contact, "user_type":params.user_type,"entreprise_id":params.entreprise_id}
+                      }) 
+                    }} 
+                  }
+                  items={[
+                    { label: 'par reference de la vente', value: 'par reference de la vente'},
+                    { label: 'par commercial', value: 'par commercial' },
+                      
+                  ]}
+                />
+            </Block> */}
+            <Block style={{marginTop:15, marginBottom:15}}> 
+              <Text>Choisir un groupe</Text>
+              <Block card style={{borderColor: theme.COLORS.SUCCESS, paddingHorizontal: theme.SIZES.BASE}}>
                 <RNPickerSelect
                   style={{
-                  // placeholder: {color: "black"},
+                    //placeholder: {color: "black"},
                     inputIOS: { color: "black" },
                     inputAndroid: { color: "black" },
                   }}
-                  placeholder={placeholder7}
-                  value={typeof backparams!=='undefined'&& this.state.choixcat==null? backparams.categorie: this.state.choixcat}
-                  onValueChange={(value) => this.choixservice(value)}
-                  items={this.state.categories}
-                /> 
+                  placeholder={placeholder2}
+                  onValueChange={(value) =>
+                    this.choixentreprise(value)
+                  }
+                  items={this.state.groupes}
+                />  
               </Block>
-              <Text>Choisir un service/produit</Text>
-              <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>
+            </Block>
+            <Block style={{marginTop:15, marginBottom:15}}> 
+              <Text>Choisir une entreprise</Text>
+              <Block card style={{borderColor: theme.COLORS.SUCCESS, paddingHorizontal: theme.SIZES.BASE}}>
+                <RNPickerSelect
+                  style={{
+                    //placeholder: {color: "black"},
+                    inputIOS: { color: "black" },
+                    inputAndroid: { color: "black" },
+                  }}
+                  placeholder={placeholder3}
+                  onValueChange={(value) =>
+                    this.choixcategorie(value)
+                  }
+                  items={this.state.entreprises}
+                />  
+              </Block>
+            </Block>
+              
+            {(
+              this.state.choixentrpse === 'KmerFood' ||
+              this.state.choixentrpse === 'Agripeel' ||
+              this.state.choixentrpse === 'WecareFood'
+            )?
+              <Block>
+                <Text /* style={{marginTop:20}} */>Choisir une categorie de produit</Text>
+                <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+                  <RNPickerSelect
+                    style={{
+                    // placeholder: {color: "black"},
+                      inputIOS: { color: "black" },
+                      inputAndroid: { color: "black" },
+                    }}
+                    placeholder={placeholder7}
+                    value={typeof backparams!=='undefined'&& this.state.choixcat==null? backparams.categorie: this.state.choixcat}
+                    onValueChange={(value) => this.choixservice(value)}
+                    items={this.state.categories}
+                  /> 
+                </Block>
+                <Text>Choisir un service/produit</Text>
+                <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>
+                    <RNPickerSelect
+                      style={{
+                        //placeholder: {color: "black"},
+                        inputIOS: { color: "black" },
+                        inputAndroid: { color: "black" },
+                      }}
+                      placeholder={placeholder4}
+                      value={this.state.choixprdt} 
+                      onValueChange={(value) =>this.choixcuvee(value) }
+                      items={this.state.service}
+                    />  
+                </Block>
+                <Text>Choisir une cuvee/batch</Text>
+                <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+                  <RNPickerSelect
+                    style={{
+                      //placeholder: {color: "black"},
+                      inputIOS: { color: "black" },
+                      inputAndroid: { color: "black" },
+                    }}
+                    placeholder={placeholder5}
+                    value={this.state.choixcuvee} 
+                    onValueChange={(value) =>this.reference(value) }
+                    items={this.state.cuvees}
+                  />  
+                </Block>
+              </Block>:
+              (
+                this.state.choixentrpse === 'Wecare SCI' ||
+                this.state.choixentrpse === 'PEEX' ||
+                this.state.choixentrpse === 'Tropical' ||
+                this.state.choixentrpse === 'Wecare Logistic'
+              )?
+              <Block>
+                <Text >Choisir une categorie de produit</Text>
+                <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
+                  <RNPickerSelect
+                    style={{
+                    // placeholder: {color: "black"},
+                      inputIOS: { color: "black" },
+                      inputAndroid: { color: "black" },
+                    }}
+                    placeholder={placeholder4}
+                    value={this.state.choixcat}
+                    onValueChange={(value) => this.choixservice(value)}
+                    items={this.state.categories}
+                  /> 
+                </Block>
+                <Text>Choisir un service/produit</Text>
+                <Block card style={{marginBottom:20,borderColor: theme.COLORS.SUCCESS,}}>
+                    <RNPickerSelect
+                      style={{
+                        //placeholder: {color: "black"},
+                        inputIOS: { color: "black" },
+                        inputAndroid: { color: "black" },
+                      }}
+                      placeholder={placeholder3}
+                      value={this.state.choixprdt} 
+                      onValueChange={ (value) => this.reference(value) }
+                      items={this.state.service}
+                    />  
+                </Block>
+              </Block>
+            :                
+              <Block>
+                <Text>Choisir un service</Text>
+                <Block card style={{marginBottom:15,borderColor: theme.COLORS.SUCCESS,paddingHorizontal: theme.SIZES.BASE}}>
                   <RNPickerSelect
                     style={{
                       //placeholder: {color: "black"},
@@ -361,68 +433,34 @@ class Modif_par_reference extends React.Component{
                       inputAndroid: { color: "black" },
                     }}
                     placeholder={placeholder4}
-                    value={this.state.choixprdt} 
-                    onValueChange={(value) =>this.choixcuvee(value) }
+                    onValueChange={(value) => this.reference(value)}
                     items={this.state.service}
                   />  
+                </Block>
               </Block>
-              <Text>Choisir une cuvee/batch</Text>
-              <Block card style={{marginBottom:20, borderColor: theme.COLORS.SUCCESS,}}>
-                <RNPickerSelect
-                  style={{
-                    //placeholder: {color: "black"},
-                    inputIOS: { color: "black" },
-                    inputAndroid: { color: "black" },
-                  }}
-                  placeholder={placeholder5}
-                  value={this.state.choixcuvee} 
-                  onValueChange={(value) =>this.reference(value) }
-                  items={this.state.cuvees}
-                />  
-              </Block>
-              </Block>
-              :                
-              <Block>
-              <Text>Choisir un service</Text>
-              <Block card style={{marginBottom:15,borderColor: theme.COLORS.SUCCESS,paddingHorizontal: theme.SIZES.BASE}}>
-                <RNPickerSelect
-                  style={{
-                    //placeholder: {color: "black"},
-                    inputIOS: { color: "black" },
-                    inputAndroid: { color: "black" },
-                  }}
-                  placeholder={placeholder4}
-                  onValueChange={(value) => this.reference(value)}
-                  items={this.state.services}
-                />  
-              </Block>
-              </Block>
-              }
-              <Text>Reference de la vente</Text>
-              <Block card style={{ paddingHorizontal: theme.SIZES.BASE, borderColor: theme.COLORS.SUCCESS }}>
-              {
-                <RNPickerSelect
-                  style={{
-                    //placeholder: {color: "black"},
-                    inputIOS: { color: "black" },
-                    inputAndroid: { color: "black" },
-                  }}
-                  placeholder={placeholder6}
-                  onValueChange={(value) => this.setState({ choixref: value })}
-                  items={this.state.references}
-                /> 
-                  
-              }
-              </Block>   
-              </Block>
-              <Block flex={1.25} right>
-                <Button center color="default" 
-                  style={styles.optionsButton} 
-                  onPress={() =>this.envoyer()}>
-                  SUIVANT
-                </Button>
-              </Block> 
-          </ScrollView>
+            }
+            <Text>Reference de la vente</Text>
+            <Block card style={{ paddingHorizontal: theme.SIZES.BASE, borderColor: theme.COLORS.SUCCESS }}>
+              <RNPickerSelect
+                style={{
+                  //placeholder: {color: "black"},
+                  inputIOS: { color: "black" },
+                  inputAndroid: { color: "black" },
+                }}
+                placeholder={placeholder6}
+                onValueChange={(value) => this.setState({ choixref: value })}
+                items={this.state.references}
+              /> 
+            </Block>   
+          </Block>
+          <Block flex={1.25} right>
+            <Button center color="default" 
+              style={styles.optionsButton} 
+              onPress={() =>this.envoyer()}>
+              SUIVANT
+            </Button>
+          </Block> 
+        </ScrollView>
       </Block>
     );
   }

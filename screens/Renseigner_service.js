@@ -72,7 +72,7 @@ class Renseigner_service extends React.Component{
           entreprise_contact:'',
           entreprisesiege_social:'',
           loading:false,
-          mode_de_paie: null,
+          mode_de_paie: 1,
           showModal: false,
           showModal2: false,
         };
@@ -440,37 +440,8 @@ class Renseigner_service extends React.Component{
     async sauvegarder() {
         const{route, navigation}=this.props;
         const {backparams}  = route.params;
-        const URL1 = racine + 'sauvegardephoto'
         if(validation === "oui" && this.state.prix_unitaire>0 && this.state.qtite>0 || validation=="oui" && typeof backparams!=undefined) { //&& backparams.prix_unitaire>0 && backparams.state.qtite>0
-            /* if(this.state.image!=null || backparams.image!=null){
-                //sauvegarde du justif
-                var donnee = new FormData();
-                donnee.append('image', {
-                    uri: this.state.image==null && backparams.image!=null?backparams.image:this.state.image, // your file path string
-                    name: '00206919-661e-469a-a19d-a8ba5587f5dc.jpg',
-                    type: 'image/jpg'
-                })
-        
-                await fetch(URL1, {
-                    headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'multipart/form-data'
-                    },
-                    method: 'POST',
-                    body: donnee
-                })
-                .then(response => response.text())
-                .then(result => {
-                    console.log(result);
-                    var rslt = JSON.parse(result);
-                    console.log(rslt['url']);
-                    if(rslt['status']=='ok'){
-                        let url = rslt['url'];
-                        this.setState({url});
-                    }
-                });
 
-            } */
             Alert.alert('le mode sauvegarde ne sauvegarde pas les justifs.')
             let data={
                 groupe:this.params.params.choixgroupe,
@@ -534,26 +505,25 @@ class Renseigner_service extends React.Component{
         }
     }
     sauvegardes(){
-        this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:"renseignerservice"}})
+        this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place: 2 }})
     }
     
     async envoyerModifier(){
-        let nvetat;
+        let nvetat = '', ref = '';
         this.params.params.reprise=="non"?
         nvetat="modifie"
         :
         nvetat="en attente";
         
-        let ref;
-        if(this.params.params.modif=="ref" && this.params.params.reprise=="non"){
+        if(this.params.params.modif === "ref" && this.params.params.reprise === "non"){
             let reftab= this.params.params.choixref.split(" ");
             ref=reftab[0];
         }
-        else if(this.params.params.modif=="ref" && this.params.params.reprise=="oui")
+        else if(this.params.params.modif === "ref" && this.params.params.reprise === "oui")
         {
             ref=this.params.params.choixref;   
         }
-        else if(this.params.params.modif=="commercial" && this.params.params.reprise=="non")
+        else if(this.params.params.modif === "commercial" && this.params.params.reprise === "non")
         {
             ref=this.state.old_reference;   
         }
@@ -561,11 +531,12 @@ class Renseigner_service extends React.Component{
         const URL = racine + 'modifier_fin';
         const URL1 = racine + 'sauvegardephoto';
         
-        if(validation=="oui" && parseInt(this.state.prix_unitaire)>0 && parseInt(this.state.qtite)>0 && this.state.raison_modif!="none"  && this.state.newDate!="aucune nouvelle date choisie" && this.state.image!=null){
-            
+        if(validation === "oui" && parseInt(this.state.prix_unitaire)>0 && parseInt(this.state.qtite)>0 && this.state.raison_modif !== "none"  && this.state.newDate !== "aucune nouvelle date choisie" && this.state.image !== null){
+            this.setState({ showModal2: true })
+            this.setState({ showModal: false })
             //sauvegarde du justif
             var data = new FormData();
-            data.append('image', {
+            data.append('preuve', {
                 uri: this.state.image, // your file path string
                 name: '00206919-661e-469a-a19d-a8ba5587f5dc.jpg',
                 type: 'image/jpg'
@@ -578,24 +549,13 @@ class Renseigner_service extends React.Component{
             data.append('user_id', this.state.seller_id)
             data.append('date_vente', this.state.newDate)
             data.append('remise', this.state.remise)
-            data.append('mode_de_paiement', this.state.mode_de_paie==null && backparams.mode_de_paie!=null? backparams.mode_de_paie:this.state.mode_de_paie)
-            data.append('groupe_de_vente_id', this.params.params.groupe_de_vente_id)
-            
-            /* let collection={
-            
-                nvetat:nvetat,
-                nvprix:this.state.prix_unitaire,
-                nvquantite:this.state.qtite,
-                nvdate:this.state.newDate,
-                raison_modif:this.state.raison_modif,
-                user_id:this.state.seller_id,
-                vente_id:this.state.vente_id,
-                preuve:this.state.url,
-                commentaire_responsable:"RAS",
-                nvremise:this.state.remise,
-                nvtype_de_vente:this.params.params.type_vente,
-                nvgroupe_de_vente_id:this.params.params.groupe_de_vente_id
-            } */
+            data.append('mode_de_paiement', 
+                this.state.mode_de_paie === null && 
+                typeof this.params.backparams != 'undefined' &&
+                this.params.backparams.mode_de_paie !=null ?
+                this.params.backparams.mode_de_paie :
+                this.state.mode_de_paie
+            )
     
             var myHeaders = {
                 'Accept': 'application/json',
@@ -607,30 +567,35 @@ class Renseigner_service extends React.Component{
                 body: data,
             }; 
 
-            fetch(URL + '/' + this.state.vente_id + '/' + this.params.params.user_id + '/' + this.params.params.type_user , requestOptions)
+            fetch(URL + '/' + this.state.vente_id + '/' + this.params.params.type_user + '/' + this.params.params.poste , requestOptions)
             .then(response => response.text())
             .then(result => {
                 console.log(result);
-                if(this.params.params.modif=="ref"){
+                if(this.params.params.modif === "ref"){
+                    this.setState({ showModal2: false })
                     Alert.alert("Modification:"+" "+this.params.params.choixproduit+" "+"du"+" "+this.state.date_ref+" "+"effective")
                     this.props.navigation.navigate('Home');
                 }
                 else{
+                    this.setState({ showModal2: false })
                     Alert.alert("Modification:"+" "+this.params.params.choixproduit+" "+"du"+" "+this.params.params.date+" "+"effective")
                     this.props.navigation.navigate('Home');
                 }
 
             })
-            .catch(error => alert("erreur sur le serveur: votre page n'a pas pu etre chargee correctement"));     
+            .catch(error => {
+                this.setState({ showModal2: false })
+                alert("erreur sur le serveur: votre page n'a pas pu etre chargee correctement")
+            });     
         }
-        else if(validation=='non' && parseInt(this.state.prix_unitaire)>=0 && parseInt(this.state.qtite)>0 && this.state.raison_modif!="none"&& this.state.newDate!="aucune nouvelle date choisie", this.state.image!=null){
-            alert("vous ne pouvez pas vendre"+' '+ this.params.params.choixentreprise+' '+"a ce prix");
+        /* else if(validation=='non' && parseInt(this.state.prix_unitaire)>=0 && parseInt(this.state.qtite)>0 && this.state.raison_modif!="none"&& this.state.newDate!="aucune nouvelle date choisie", this.state.image!=null){
+            alert("vous ne pouvez pas vendre"+' '+ this.params.params.choixproduit+' '+"a ce prix");
         }
         else if(validation=='non' && parseInt(this.state.qtite)<=0 && this.state.raison_modif!="none" && this.state.newDate!="aucune nouvelle date choisie" && this.state.image!=null){
             alert("Les valeurs entrees ne sont pas valides");
-        }
+        } */
         else{
-            alert("Remplissez tous les champs SVP");
+            alert("Verifiez vos valeurs et Remplissez tous les champs SVP");
         }
     }
     OnDateChange = (newDate) => {
@@ -755,7 +720,7 @@ class Renseigner_service extends React.Component{
                                 {/* <TouchableOpacity onPress={this._takeImage}><Text>PHOTOGRAPHIER LE JUSTIFICATIF</Text></TouchableOpacity> */}
                                 <Button style={styles.uploadButton} onPress={this._takeImage} > PHOTOGRAPHIER LE JUSTIFICATIF DE LA VENTE </Button>
                                 <Text>OU</Text>
-                                <Button style={styles.uploadButton} onPress={this._pickImage} > CHOISIR LE JUSTIFICTIF DE LA VENTE </Button>
+                                <Button style={styles.uploadButton} onPress={this._pickImage} > CHOISIR LE JUSTIFICATIF DE LA VENTE </Button>
                                 {typeof backparams!=='undefined' && image==null ? backparams.image && <Image source={{ uri: backparams.image}} style={{ width: 200, height: 200 }} /> : image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                             </Block>
                             <Block style={{ paddingHorizontal: theme.SIZES.BASE, marginTop:10 }}>
@@ -893,11 +858,6 @@ class Renseigner_service extends React.Component{
                                         Veuillez patienter
                                     </Heading>
                                 </Modal.Body>
-                                {/* <Modal.Footer>
-                                    <Button>
-                                        Loading
-                                    </Button>
-                                </Modal.Footer> */}
                             </Modal.Content>
                         </Modal>
                     </ScrollView>           
@@ -977,8 +937,8 @@ class Renseigner_service extends React.Component{
                                     <Day OnDateChange={this.OnDateChange}/>
                                 </Block >
                                 <Block  flex={1.25} middle style={{paddingHorizontal: theme.SIZES.BASE, marginTop:10}}>
-                                    <Button style={{paddingHorizontal: theme.SIZES.BASE,  marginTop:10, backgroundColor:'#2ECC71',marginBottom:10, width:"93%"}}/* style={styles.uploadButton} */ 
-                                    onPress={this._pickImage} > JUSTIFICTIF DE LA VENTE </Button>
+                                    <Button style={{marginTop:10, backgroundColor:'#2ECC71',marginBottom:10, width:"100%"}}/* style={styles.uploadButton} */ 
+                                    onPress={this._pickImage} > JUSTIFICATIF DE LA VENTE </Button>
                                     {image && <Image source={{ uri:image}} style={{ width: 200, height: 200 }} /> }
                                 </Block>
                                 { this.params.params.reprise=="non"?
@@ -1050,12 +1010,64 @@ class Renseigner_service extends React.Component{
                                 </Block>
                         </Block>
                         <Block flex={1.25} right>
-                            <Button center color='default' 
+                            <Button center
                                 style={styles.optionsButtonmodif} 
-                                onPress={() => {this.envoyerModifier()}}>
+                                onPress={() => {this.setState({ showModal: true })}}>
                                 ENVOYER
                             </Button>
                         </Block>
+                        <Modal isOpen={this.state.showModal} onClose={() => this.setState({showModal: false})}>
+                            <Modal.Content maxWidth="400px">
+                                <Modal.CloseButton />
+                                <Modal.Header>Recapitulatif de la Modification</Modal.Header>
+                                <Modal.Body>
+                                    <Text>entreprise: {params.choixentreprise}</Text>
+                                    {params.categorie ? 
+                                        <Text>categorie: {params.categorie}</Text>
+                                    :   null
+                                    }
+                                    <Text>produit: {params.choixproduit}</Text>
+                                    {params.cuvee ? 
+                                        <Text>cuvee: {params.cuvee}</Text>
+                                    :   null
+                                    }
+                                    <Text>quantite: {this.state.qtite}</Text>
+                                    <Text>prix de vente: {this.state.prix_unitaire} FCFA </Text>
+                                     <Text>mode de paiement: {this.state.mode_de_paie === 1 ? 'comptant': 'a credit'}</Text>
+                                    {params.choixtypefssr === 'interne' ? 
+                                        <Text>fournisseur: {params.choixfssr}</Text>
+                                    :   params.choixtypefssr === 'externe' ?
+                                        <Text>fournisseur: {params.fsseurExt}</Text>
+                                    :   null
+                                    }
+                                    <Text>date: {this.state.newDate}</Text>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button.Group variant="ghost" space={2}>
+                                        <Button
+                                            onPress={() => this.setState({showModal: false})}
+                                        >
+                                            REPRENDRE
+                                        </Button>
+                                        <Button onPress={() => { this.envoyerModifier() }}>
+                                            ENVOYER
+                                        </Button>
+                                    </Button.Group>
+                                </Modal.Footer>
+                            </Modal.Content>
+                        </Modal>
+                        <Modal isOpen={this.state.showModal2} /* onClose={() => this.setState({showModal2: false})} bg={'transparent'} */>
+                            <Modal.Content maxWidth="400px">
+                                {/* <Modal.CloseButton /> */}
+                                <Modal.Header>Recapitulatif de la Modification</Modal.Header>
+                                <Modal.Body space={2} justifyContent="center" direction="row">
+                                    <Spinner accessibilityLabel="Loading posts" />
+                                    <Heading color="primary.500" fontSize="md">
+                                        Veuillez patienter
+                                    </Heading>
+                                </Modal.Body>
+                            </Modal.Content>
+                        </Modal>
                     </ScrollView>           
                 </Block>
             )
@@ -1203,7 +1215,7 @@ const styles= StyleSheet.create({
     },
       optionsButtonmodif: {
         width: "auto",
-        height: 34,
+        height: "auto",
         paddingHorizontal: theme.SIZES.BASE,
         paddingVertical: 10,
         backgroundColor: 'orange',

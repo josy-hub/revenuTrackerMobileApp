@@ -101,7 +101,7 @@ class Notifications extends React.Component{
                 <ScrollView>
                     <Block card style={styles.service_card}> 
                         <Text  h5
-                            color={argonTheme.COLORS.DEFAULT}
+                            /* color={argonTheme.COLORS.DEFAULT} */
                         >
                             Vous avez au total: {ventes.length} notifications
                         </Text>
@@ -247,9 +247,10 @@ styles=StyleSheet.create({
     },
     service_card:{
         width: "auto", 
-        height:50,
+        height:"auto",
         backgroundColor:argonTheme.COLORS.SWITCH_OFF,
         marginHorizontal:5,
+        paddingHorizontal: "auto",
         marginTop:20,
         //marginBottom:20,
         alignItems:"center",

@@ -54,10 +54,10 @@ class Home extends React.Component {
       entreprise:params.raison_social    
     }
     console.log('notifs',notifications);
-    try{
-        await AsyncStorage.setItem('notifications', JSON.stringify(notifications))
-    } catch(e){
-        console.log(e);
+    try {
+      await AsyncStorage.setItem('notifications', JSON.stringify(notifications))
+    } catch(e) {
+      console.log(e);
     }
   }
   
@@ -74,7 +74,7 @@ class Home extends React.Component {
           >
             <Block card style={styles.name_container}>
               <Text bold size={18} color="#FFF" style={{ textAlign: "center" }}>
-                User {params.nom}, {params.poste} de {params.raison_social}
+                {params.nom}, {params.poste} de {params.raison_social}
               </Text>
             </Block>
             <ScrollView style={{ width, height }} keyboardShouldPersistTaps="always">

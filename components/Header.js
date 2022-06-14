@@ -3,6 +3,7 @@ import { withNavigation } from '@react-navigation/compat';
 import { TouchableOpacity, StyleSheet, Platform, Dimensions } from 'react-native';
 import { Button, Block, NavBar, Text, theme } from 'galio-framework';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DrawerActions } from '@react-navigation/native';
 
 import Icon from './Icon';
 import Input from './Input';
@@ -98,10 +99,10 @@ class Header extends React.Component {
       console.log('val notiiiif',value)
       if(value !==null){
         const ventes = await notifs.notifications(value.type, value.contact, value.entreprise );
-        if(ventes['status']=='ok'){
+        if(ventes['status']=='ok') {
           //console.log('vvvventes',ventes);
-          let counter=ventes['ventes'].length;
-          this.setState({counter:counter});
+          let counter = ventes['ventes'].length;
+          this.setState({ counter: counter });
           return(ventes['ventes']);
         }
         else{
@@ -109,14 +110,16 @@ class Header extends React.Component {
         }
       }
     } catch(e){
-        //Alert.alert("Erreur: les donnees sauvegardees n'ont pas pu etre recuperees");
+      //Alert.alert("Erreur: les donnees sauvegardees n'ont pas pu etre recuperees");
     }
   
   }
   
   handleLeftPress = () => {
     const { back, navigation } = this.props;
-    return (back ? navigation.goBack() : navigation.openDrawer());
+    console.log('navigation',navigation.getParent('Drawer'))
+    //back ? navigation.goBack() : navigation.openDrawer()
+    return (back ? navigation.goBack() : navigation.getParent('Stack').openDrawer());
   }
   renderRight = () => {
     const { white, title, navigation } = this.props;
@@ -245,7 +248,7 @@ class Header extends React.Component {
       styles.navbar,
       bgColor,// && { backgroundColor: bgColor },
     ];
-
+    console.log(navigation.getParent('Stack'))
     return (
       <Block style={headerStyles}>
         <NavBar
@@ -256,13 +259,16 @@ class Header extends React.Component {
           right={this.renderRight()}
           rightStyle={{ alignItems: 'center' }}
           left={
-            <Icon 
-              name={back ? 'chevron-left' : "menu"} family="entypo" 
-              size={30} onPress={this.handleLeftPress} 
-              color={iconColor || (white ? argonTheme.COLORS.WHITE : argonTheme.COLORS.ICON)}
-              style={{ marginTop: 2 }}
-            />
-              
+            <TouchableOpacity onPress={()=> this.handleLeftPress()} >
+              <Icon 
+                /* name={back ? 'chevron-left' : "menu"} family="entypo" */ 
+                name={back ? 'chevron-left' : ""} family="entypo"
+                size={30}
+                color={iconColor || (white ? argonTheme.COLORS.WHITE : argonTheme.COLORS.ICON)}
+                style={{ marginTop: 2, marginRight: 3 }}
+              /> 
+            </TouchableOpacity>
+             
           }
           leftStyle={{ paddingVertical: 12, flex: 0.2 }}
           titleStyle={[
@@ -272,7 +278,7 @@ class Header extends React.Component {
           ]}
           {...props}
         />
-        {/* {this.renderHeader()} */}
+        {this.renderHeader()}
       </Block>
     );
   }

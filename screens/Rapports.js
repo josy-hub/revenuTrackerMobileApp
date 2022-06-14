@@ -411,7 +411,8 @@ const styles = StyleSheet.create({
   },
   optionsButtonc: {
     width: "auto",
-    height: 30,
+    //height: 30,
+    height: "auto",
     paddingHorizontal: theme.SIZES.BASE,
     paddingVertical: 10,
     backgroundColor:"orange",

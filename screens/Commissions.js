@@ -19,7 +19,8 @@ class Commissions extends React.Component{
                             <Block flex={1.25} right>
                                 <Button center color="default" 
                                     style={styles.optionsButton} 
-                                    onPress={() => navigation.navigate("Consulter_les_revenus")}>
+                                    /* onPress={() => navigation.navigate("Consulter_les_revenus")} */
+                                >
                                     details sur la vente
                                 </Button>
                             </Block>

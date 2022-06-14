@@ -80,7 +80,10 @@ class Register extends React.Component {
           alert("vos identifiants sont invalides");
         }
       })
-      .catch(error => alert("erreur sur le serveur: votre page n'a pas pu etre chargee correctement"));
+      .catch(error => {
+        console.log(error)
+        alert("erreur sur le serveur: votre page n'a pas pu etre chargee correctement")
+      });
   }
   render() {
   
@@ -232,9 +235,9 @@ const styles = StyleSheet.create({
   tinyLogo: {
     width: width * 0.3,
     height: height*0.15,
-    position:'relative',
+    /* position:'relative', */
     marginHorizontal:width * 0.35,
-    marginTop:35,
+    marginTop:height/10,
     marginBottom:20
   },
 });

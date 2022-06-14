@@ -408,6 +408,7 @@ function AppDrawer(props) {
           marginLeft: 12,
           fontWeight: "normal",
         },
+        headerShown: false
       }}
       initialRouteName="Connexion"
     >

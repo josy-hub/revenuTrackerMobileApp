@@ -15,12 +15,12 @@ class Mes_parametres extends React.Component{
         super(props);
         this.state = {
           oldemail:'',
-          emailcompare:'',
-          newemail:'none',
+          emailcompare: null,
+          newemail: null,
           oldpass:'',
-          passcompare:'',
-          newpass:'none',
-          confirmpass:'',
+          passcompare: null,
+          newpass: null,
+          confirmpass: null,
           entreprise_id:'',
           type:'',
           photo:'',
@@ -39,8 +39,8 @@ class Mes_parametres extends React.Component{
         try{
             const notifications = await AsyncStorage.getItem('notifications');
             const value=JSON.parse(notifications);
-            console.log(value)
-            if(value !==null){
+            console.log('localstorage', value)
+            if(value !== null){
              this.setState({
                 entreprise_id:value.entreprise_id,
                 equipe_id:value.equipe_id,
@@ -65,8 +65,8 @@ class Mes_parametres extends React.Component{
         console.log(this.state.oldemail);
         console.log(this.state.emailcompare);
         
-        if(this.state.newemail!='none' && this.state.emailcompare===this.state.oldemail && update==1){
-           console.log("bonjour")
+        if(this.state.newemail !== null && this.state.emailcompare === this.state.oldemail && update === 1){
+           console.log("bonjour", this.state.user_id)
             let someData={
                 "entreprise_id": this.state.entreprise_id,
                 "equipe_id":this.state.equipe_id,
@@ -81,21 +81,46 @@ class Mes_parametres extends React.Component{
             }
             let url=`https://tracking.socecepme.com/api/update/${this.state.user_id}/1`
 
+            /* var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("email", this.state.newemail)
+            urlencoded.append("entreprise_id", this.state.entreprise_id)
+            urlencoded.append("equipe_id", this.state.equipe_id)
+            urlencoded.append("nom", this.state.nom)
+            urlencoded.append("username", this.state.username)
+            urlencoded.append("poste", this.state.poste)
+            urlencoded.append("type", this.state.type)
+            urlencoded.append("password", this.state.oldpass)
+            urlencoded.append("photo", this.state.photo)
+            urlencoded.append("contact", this.state.contact); */
+
+            /* var requestOptions = {
+                method: 'PUT',
+                headers: myHeaders,
+                body: urlencoded,
+                redirect: 'follow'
+            }; */
             const putMethod = {
                 method: 'PUT', 
                 headers: {
                  'Content-type': 'application/json; charset=UTF-8' 
                 },
                 body: JSON.stringify(someData) 
-               }
+            }
                
-               fetch(url, putMethod)
-               .then(response => response.json())
-               .then(data => {
-                    console.log(data);
-                    Alert.alert("Email modifie avec succes");
-                }) 
-               .catch(error => alert("erreur sur le serveur: votre modification n'a pas ete prise en compte")); 
+            fetch(url, putMethod)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                Alert.alert("Email modifie avec succes");
+                this.setState({
+                    newemail: null,
+                    emailcompare: null
+                })
+            }) 
+            .catch(error => alert("erreur sur le serveur: votre modification n'a pas ete prise en compte")); 
        
         }
         else if(this.state.newpass!='none' && this.state.confirmpass===this.state.newpass && update==2){
@@ -147,7 +172,7 @@ class Mes_parametres extends React.Component{
                     const putMethod = {
                         method: 'PUT', 
                         headers: {
-                        'Content-type': 'application/json; charset=UTF-8' 
+                            'Content-type': 'application/json; charset=UTF-8' 
                         },
                         body: JSON.stringify(someData) 
                     }
@@ -155,9 +180,14 @@ class Mes_parametres extends React.Component{
                     fetch(url, putMethod)
                     .then(response => response.json())
                     .then(data => {
-                            console.log(data);
-                            Alert.alert("mot de passe modifie avec succes");
-                            //this.props.navigation.navigate('Home');
+                        console.log(data);
+                        Alert.alert("mot de passe modifie avec succes");
+                        //this.props.navigation.navigate('Home');
+                        this.setState({
+                            newpass: null,
+                            passcompare: null,
+                            confirmpass: null
+                        })
                     }) 
                     .catch(error => alert("erreur sur le serveur: votre modification n'a pas ete prise en compte")); 
 
@@ -183,14 +213,14 @@ class Mes_parametres extends React.Component{
                             style={{
                                 justifyContent:"center",
                                 alignItems:"center", 
-                                marginBottom: 10
+                                marginBottom: 20
                             }}
                             color={argonTheme.COLORS.DEFAULT}
                         >
                             Changer votre email
                         </Text>
-                        <Text>Adresse actuelle</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Text>Adresse actuelle</Text>
                             <Input type='email-address'
                                 right
                                 placeholder="Adresse actuelle"
@@ -200,13 +230,14 @@ class Mes_parametres extends React.Component{
                                     backgroundColor: "#fff",
                                     marginBottom: 10
                                 }}
+                                value={this.state.emailcompare}
                                 onChangeText={(input) =>this.setState({emailcompare:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
                         </Block>
-                        <Text>Nouvelle adresse</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Text>Nouvelle adresse</Text>
                             <Input type='email-address'
                                 right
                                 placeholder="Nouvelle adresse"
@@ -216,6 +247,7 @@ class Mes_parametres extends React.Component{
                                     backgroundColor: "#fff",
                                     marginBottom: 10
                                 }}
+                                value={this.state.newemail}
                                 onChangeText={(input) =>this.setState({newemail:input})}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
@@ -235,14 +267,14 @@ class Mes_parametres extends React.Component{
                             style={{
                                 justifyContent: "center",
                                 alignItems: "center", 
-                                marginBottom: 10
+                                marginBottom: 20
                             }}
                             color={argonTheme.COLORS.DEFAULT}
                         >
                             Changer votre mot de passe
                         </Text>
-                        <Text>Mot de passe actuel</Text>
                         <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                            <Text>Mot de passe actuel</Text>
                             <Input
                                 right
                                 onChangeText={(input) =>this.setState({passcompare:input})}
@@ -252,8 +284,10 @@ class Mes_parametres extends React.Component{
                                 style={{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
-                                    backgroundColor: "#fff"
+                                    backgroundColor: "#fff",
+                                    marginBottom: 20
                                 }}
+                                value={this.state.passcompare}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
@@ -270,8 +304,9 @@ class Mes_parametres extends React.Component{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
                                     backgroundColor: "#fff",
-                                    marginBottom: 10
+                                    marginBottom: 20
                                 }}
+                                value = {this.state.newpass}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}
                             />
@@ -282,10 +317,12 @@ class Mes_parametres extends React.Component{
                                 password
                                 viewPass
                                 placeholder="Confirmer le mot de passe"
+                                value = {this.state.confirmpass}
                                 style={{
                                     borderColor: theme.COLORS.SUCCESS,
                                     borderRadius: 4,
-                                    backgroundColor: "#fff"
+                                    backgroundColor: "#fff",
+                                    marginBottom: 20
                                 }}
                                 placeholderTextColor="black"
                                 iconContent={<Block />}

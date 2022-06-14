@@ -383,7 +383,7 @@
     }
     
     sauvegardes(){
-      this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place:1}})
+      this.props.navigation.navigate('Sauvegardes',{params:{contact:this.params.params.contact, place: 1}})
     }
     suivant()
     {
